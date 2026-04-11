@@ -76,6 +76,23 @@ curl -s http://127.0.0.1:8080/v1/chat \
 
 改用 **OpenAI / Groq** 等：在 `.env` 中覆盖上述三项，见 `.env.example` 注释。
 
+### Google Gemini（公网、免费额度）
+
+后端已用 **OpenAI 兼容** 的 `POST .../chat/completions`，可直接接 [Gemini 的 OpenAI 兼容端点](https://ai.google.dev/gemini-api/docs/openai)：
+
+1. 在 [Google AI Studio](https://aistudio.google.com/apikey) 创建 API Key（仅保存在服务器 `.env`，勿提交仓库）。
+2. 在 `.env` 中设置（`GEMINI_*` 与 `OPENAI_*` 等价，二选一即可）：
+
+```env
+GEMINI_API_KEY=你的密钥
+OPENAI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
+GEMINI_MODEL=gemini-2.0-flash
+```
+
+3. 重启 `uvicorn`。`GET /health` 中的 `model` 应显示所选 Gemini 模型名。
+
+模型名以 [官方文档](https://ai.google.dev/gemini-api/docs/models/gemini) 为准，可按需改为 `gemini-2.5-flash` 等。
+
 ## 新增记忆
 
 在 `data/corpus/` 下增改文本后：
