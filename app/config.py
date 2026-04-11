@@ -7,9 +7,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    openai_api_key: str = Field(default="", validation_alias="OPENAI_API_KEY")
-    openai_base_url: str = Field(default="https://api.openai.com/v1", validation_alias="OPENAI_BASE_URL")
-    openai_model: str = Field(default="gpt-4o-mini", validation_alias="OPENAI_MODEL")
+    # Defaults target local Ollama (OpenAI-compatible /v1/chat/completions). Override in .env for cloud APIs.
+    openai_api_key: str = Field(default="ollama", validation_alias="OPENAI_API_KEY")
+    openai_base_url: str = Field(default="http://127.0.0.1:11434/v1", validation_alias="OPENAI_BASE_URL")
+    openai_model: str = Field(default="llama3.2", validation_alias="OPENAI_MODEL")
 
     mempalace_palace_path: str = Field(default="", validation_alias="MEMPALACE_PALACE_PATH")
     mempalace_default_wing: str | None = Field(default=None, validation_alias="MEMPALACE_DEFAULT_WING")
