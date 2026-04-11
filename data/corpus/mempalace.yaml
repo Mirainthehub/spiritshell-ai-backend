@@ -1,0 +1,10 @@
+wing: corpus
+rooms:
+- name: spiritshell
+  description: Files from spiritshell/
+  keywords:
+  - spiritshell
+  - spiritshell
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []
