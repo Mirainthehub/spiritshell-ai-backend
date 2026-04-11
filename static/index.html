@@ -204,6 +204,18 @@
       div.textContent = text;
       messagesEl.appendChild(div);
       messagesEl.scrollTop = messagesEl.scrollHeight;
+      return div;
+    }
+
+    /** FastAPI HTTPException / validation 的 detail 可能是 string、{error} 或数组 */
+    function formatApiError(data) {
+      const d = data && data.detail;
+      if (d == null) return JSON.stringify(data || {});
+      if (typeof d === "string") return d;
+      if (typeof d.error === "string") return d.error;
+      if (Array.isArray(d))
+        return d.map((x) => (x.msg ? x.msg : JSON.stringify(x))).join("；");
+      return JSON.stringify(d);
     }
 
     async function send() {
@@ -219,27 +231,49 @@
         use_memory: useMemory.checked,
       };
 
+      const loadingEl = appendBubble("assistant", "正在生成…（首次调用模型可能需几十秒）", "assistant");
+
       try {
         const res = await fetch("/v1/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        const data = await res.json().catch(() => ({}));
+        const raw = await res.text();
+        let data = {};
+        try {
+          data = raw ? JSON.parse(raw) : {};
+        } catch {
+          loadingEl.remove();
+          appendBubble("assistant", "响应不是合法 JSON：" + raw.slice(0, 200), "error");
+          return;
+        }
+
+        loadingEl.remove();
 
         if (!res.ok) {
-          const err = data.detail?.error || data.detail || JSON.stringify(data);
-          appendBubble("assistant", "请求失败：" + err, "error");
+          appendBubble("assistant", "请求失败：" + formatApiError(data), "error");
+          return;
+        }
+
+        const reply = data.reply != null ? String(data.reply) : "";
+        if (!reply.trim()) {
+          appendBubble(
+            "assistant",
+            "模型返回了空内容。请在本机执行 `ollama list` 确认 OPENAI_MODEL 与之一致，并已 `ollama pull <模型名>`。也可看终端里 uvicorn 的报错。",
+            "error"
+          );
           return;
         }
 
         history.push({ role: "user", content: text });
-        history.push({ role: "assistant", content: data.reply });
-        appendBubble("assistant", data.reply);
+        history.push({ role: "assistant", content: reply });
+        appendBubble("assistant", reply);
 
         const mem = data.memory_injected ? "已注入" : "未命中";
         healthOut.textContent = `OK · 记忆 ${mem} (${data.memory_status})`;
       } catch (e) {
+        loadingEl.remove();
         appendBubble("assistant", "网络错误：" + (e && e.message ? e.message : String(e)), "error");
       } finally {
         sendBtn.disabled = false;
