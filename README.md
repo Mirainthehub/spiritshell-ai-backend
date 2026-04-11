@@ -85,6 +85,12 @@ export MEMPALACE_PALACE_PATH="$PWD/data/palace"
 mempalace mine data/corpus --wing spiritshell --no-gitignore
 ```
 
+## 与官网「稍稍体验」对接
+
+仓库 [spiritshell-website](https://github.com/mirainthehub/spiritshell-website) 中编辑 `js/spiritshell-api-config.js`，将 `SPIRITSHELL_API_BASE` 设为你部署后的 **HTTPS** API 根地址（无末尾斜杠）。官网 `experience.html` 将向 `{API}/v1/chat` 发送请求。
+
+本服务默认 **CORS** 允许任意来源（`allow_origins=["*"]`），便于 Pages / 自定义域名调用；上线建议改为明确域名列表并配合鉴权。
+
 ## 与灵壳产品的关系
 
 本仓库为自研后端示例；生产环境需自行做脱敏、同意与多租户隔离。
