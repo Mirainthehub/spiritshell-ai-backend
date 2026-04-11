@@ -1,15 +1,19 @@
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from app.config import Settings, get_settings
 from app.llm import LLMError, chat_completions
 from app.memory import format_memory_for_prompt, search_memory
 from app.safety import SafetyResult, check_user_text, last_user_message
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
 DEFAULT_SYSTEM = (
     "你是灵壳 SpiritShell 的 AI 陪伴助手。语气温暖、简洁；"
@@ -72,6 +76,20 @@ def settings_dep() -> Settings:
     s = get_settings()
     _apply_settings_env(s)
     return s
+
+
+@app.get("/")
+async def chat_ui_root() -> FileResponse:
+    """浏览器对话页（与 API 同源，避免 file:// 跨域）。"""
+    index = STATIC_DIR / "index.html"
+    if not index.is_file():
+        raise HTTPException(status_code=404, detail="static/index.html missing")
+    return FileResponse(index)
+
+
+@app.get("/chat")
+async def chat_ui_alias() -> FileResponse:
+    return await chat_ui_root()
 
 
 @app.get("/health")

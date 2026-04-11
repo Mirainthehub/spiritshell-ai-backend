@@ -48,7 +48,11 @@ chmod +x scripts/bootstrap_memory.sh
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
 ```
 
-测试：
+**浏览器对话页**（与后端同源，直接调 `/v1/chat`）：
+
+- 打开：<http://127.0.0.1:8080/> 或 <http://127.0.0.1:8080/chat>
+
+命令行测试：
 
 ```bash
 curl -s http://127.0.0.1:8080/health | jq .
