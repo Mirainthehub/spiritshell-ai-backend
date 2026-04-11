@@ -1,296 +1,533 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>灵壳 SpiritShell · 对话</title>
-  <style>
-    :root {
-      --bg: #0c4a6e;
-      --bg-soft: #f0f9ff;
-      --card: #fff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --accent: #0369a1;
-      --accent-hover: #075985;
-      --user: #e0f2fe;
-      --assistant: #f8fafc;
-      --border: #e2e8f0;
-      --radius: 14px;
-      --font: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: var(--font);
-      background: linear-gradient(165deg, var(--bg) 0%, #075985 45%, var(--bg-soft) 45%);
-      color: var(--text);
-    }
-    .shell {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 1.25rem;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    header {
-      text-align: center;
-      color: #fff;
-      padding: 1rem 0 1.5rem;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 1.35rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-    header p {
-      margin: 0.35rem 0 0;
-      font-size: 0.85rem;
-      opacity: 0.85;
-    }
-    .panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      min-height: 420px;
-    }
-    .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      align-items: center;
-      padding: 0.65rem 1rem;
-      font-size: 0.75rem;
-      color: var(--muted);
-      background: #f8fafc;
-      border-bottom: 1px solid var(--border);
-    }
-    .meta label { display: flex; align-items: center; gap: 0.35rem; cursor: pointer; }
-    .meta output { font-variant-numeric: tabular-nums; }
-    #messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .bubble {
-      max-width: 92%;
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
-      line-height: 1.55;
-      font-size: 0.95rem;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .bubble.user {
-      align-self: flex-end;
-      background: var(--user);
-      border: 1px solid #bae6fd;
-    }
-    .bubble.assistant {
-      align-self: flex-start;
-      background: var(--assistant);
-      border: 1px solid var(--border);
-    }
-    .bubble.error {
-      align-self: stretch;
-      background: #fef2f2;
-      border-color: #fecaca;
-      color: #991b1b;
-    }
-    .composer {
-      display: flex;
-      gap: 0.5rem;
-      padding: 0.75rem;
-      border-top: 1px solid var(--border);
-      background: #fafafa;
-    }
-    .composer textarea {
-      flex: 1;
-      resize: none;
-      min-height: 44px;
-      max-height: 160px;
-      padding: 0.65rem 0.85rem;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      font: inherit;
-      line-height: 1.45;
-    }
-    .composer textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.15);
-    }
-    button.send {
-      align-self: flex-end;
-      padding: 0.65rem 1.25rem;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #fff;
-      background: var(--accent);
-      cursor: pointer;
-      transition: background 0.15s ease;
-    }
-    button.send:hover:not(:disabled) { background: var(--accent-hover); }
-    button.send:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
-    footer {
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--muted);
-      padding: 1rem;
-    }
-    footer a { color: var(--accent); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵壳 · SpiritShell</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { height: 100%; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fdfcff;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 2.5rem 0 3rem;
+        }
+
+        /* ─── Luma gradient orbs（与 spiritshell.org/experience-entry 一致）─── */
+
+        .orbs {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+        }
+
+        .orb-1 {
+            width: 720px;
+            height: 720px;
+            top: -30%;
+            left: -20%;
+            background: radial-gradient(circle, rgba(9, 158, 241, 0.22) 0%, transparent 60%);
+            animation: drift-1 26s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 600px;
+            height: 600px;
+            top: -20%;
+            right: -18%;
+            background: radial-gradient(circle, rgba(104, 99, 248, 0.20) 0%, transparent 60%);
+            animation: drift-2 22s ease-in-out infinite;
+        }
+
+        .orb-3 {
+            width: 640px;
+            height: 640px;
+            bottom: -25%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(240, 88, 197, 0.18) 0%, transparent 60%);
+            animation: drift-3 30s ease-in-out infinite;
+        }
+
+        .orb-4 {
+            width: 400px;
+            height: 400px;
+            bottom: -10%;
+            right: -8%;
+            background: radial-gradient(circle, rgba(255, 137, 31, 0.14) 0%, transparent 60%);
+            animation: drift-4 18s ease-in-out infinite;
+        }
+
+        .orb-5 {
+            width: 500px;
+            height: 500px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(216, 79, 250, 0.07) 0%, transparent 60%);
+            animation: breathe-orb 11s ease-in-out infinite;
+        }
+
+        @keyframes drift-1 {
+            0%, 100% { transform: translate(0, 0); }
+            40%       { transform: translate(40px, 50px); }
+            70%       { transform: translate(-20px, 30px); }
+        }
+
+        @keyframes drift-2 {
+            0%, 100% { transform: translate(0, 0); }
+            35%       { transform: translate(-35px, 40px); }
+            70%       { transform: translate(15px, 20px); }
+        }
+
+        @keyframes drift-3 {
+            0%, 100% { transform: translateX(-50%) translate(0, 0); }
+            50%       { transform: translateX(-50%) translate(30px, -30px); }
+        }
+
+        @keyframes drift-4 {
+            0%, 100% { transform: translate(0, 0); }
+            50%       { transform: translate(-25px, -35px); }
+        }
+
+        @keyframes breathe-orb {
+            0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+            50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.18); }
+        }
+
+        /* ─── Water ripple rings ─── */
+
+        .ripples {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            background:
+                linear-gradient(#fdfcff, #fdfcff) padding-box,
+                linear-gradient(
+                    145deg,
+                    rgba(104, 99, 248, 0.28),
+                    rgba(9, 158, 241, 0.18) 35%,
+                    rgba(240, 88, 197, 0.18) 65%,
+                    rgba(255, 137, 31, 0.10)
+                ) border-box;
+            transform: translate(-50%, -50%) scale(0.2);
+            opacity: 0;
+            animation: water-ripple 20s cubic-bezier(0.15, 0.5, 0.4, 1) infinite;
+        }
+
+        .ring.r1 { width: 300px;  height: 190px;  animation-delay: 0s;  }
+        .ring.r2 { width: 500px;  height: 320px;  animation-delay: 4s;  }
+        .ring.r3 { width: 700px;  height: 450px;  animation-delay: 8s;  }
+        .ring.r4 { width: 900px;  height: 580px;  animation-delay: 12s; }
+        .ring.r5 { width: 1100px; height: 710px;  animation-delay: 16s; }
+
+        @keyframes water-ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(0.2);
+                opacity: 0;
+            }
+            6%  { opacity: 1; }
+            60% {
+                background:
+                    linear-gradient(#fdfcff, #fdfcff) padding-box,
+                    linear-gradient(
+                        145deg,
+                        rgba(104, 99, 248, 0.06),
+                        rgba(9, 158, 241, 0.04) 35%,
+                        rgba(240, 88, 197, 0.04) 65%,
+                        rgba(255, 137, 31, 0.02)
+                    ) border-box;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* ─── Content（入口页 + 对话流）─── */
+
+        .content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 560px;
+            padding: 0 28px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            font-weight: 300;
+            color: rgba(30, 22, 55, 0.78);
+            letter-spacing: 0.015em;
+            margin-bottom: 0.55rem;
+        }
+
+        .hero-sub {
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: rgba(90, 75, 130, 0.48);
+            line-height: 2.2;
+            margin-bottom: 2rem;
+            letter-spacing: 0.025em;
+        }
+
+        /* 多轮对话：与 experience.html 一致的句型 */
+        .thread {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .turn {
+            margin-bottom: 2.6rem;
+        }
+
+        .turn:last-child { margin-bottom: 1.2rem; }
+
+        .user-sentence {
+            font-size: 0.98rem;
+            font-weight: 300;
+            color: rgba(90, 75, 130, 0.52);
+            font-style: italic;
+            line-height: 1.85;
+            letter-spacing: 0.01em;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .divider {
+            width: 36px;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(104, 99, 248, 0.30),
+                rgba(240, 88, 197, 0.25),
+                transparent
+            );
+            margin: 2rem auto;
+        }
+
+        .response {
+            font-size: 1.05rem;
+            font-weight: 300;
+            color: rgba(28, 20, 52, 0.78);
+            line-height: 2.2;
+            letter-spacing: 0.025em;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .response.visible { animation: fadeUp 1s ease forwards; }
+
+        .response.pending {
+            color: rgba(120, 100, 170, 0.45);
+            font-style: italic;
+        }
+
+        .response.err {
+            color: rgba(160, 60, 80, 0.85);
+            font-style: normal;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(140, 120, 200, 0.18);
+            border-radius: 16px;
+            padding: 20px 22px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 300;
+            color: rgba(28, 20, 52, 0.85);
+            line-height: 1.78;
+            resize: none;
+            min-height: 112px;
+            outline: none;
+            transition: border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease;
+            caret-color: rgba(104, 99, 248, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 2px 20px rgba(104, 99, 248, 0.06);
+        }
+
+        textarea::placeholder {
+            color: rgba(120, 105, 165, 0.38);
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        textarea:focus {
+            background: rgba(255, 255, 255, 0.88);
+            border-color: rgba(104, 99, 248, 0.30);
+            box-shadow:
+                0 0 0 3px rgba(104, 99, 248, 0.08),
+                0 4px 30px rgba(104, 99, 248, 0.12),
+                0 2px 20px rgba(240, 88, 197, 0.06);
+        }
+
+        .presence {
+            font-size: 0.73rem;
+            font-weight: 300;
+            color: rgba(120, 100, 170, 0.32);
+            letter-spacing: 0.16em;
+            margin-top: 0.7rem;
+            text-align: right;
+            padding-right: 4px;
+            user-select: none;
+        }
+
+        .enter-hint {
+            margin-top: 2.2rem;
+            font-size: 0.68rem;
+            font-weight: 300;
+            color: rgba(110, 95, 150, 0.28);
+            letter-spacing: 0.1em;
+            user-select: none;
+        }
+
+        .footer-meta {
+            margin-top: 1.2rem;
+            font-size: 0.65rem;
+            font-weight: 300;
+            color: rgba(110, 95, 150, 0.35);
+            letter-spacing: 0.06em;
+        }
+
+        .footer-meta label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .footer-meta a {
+            color: rgba(104, 99, 248, 0.45);
+            text-decoration: none;
+        }
+
+        .footer-meta a:hover { color: rgba(104, 99, 248, 0.75); }
+
+        @media (max-width: 420px) {
+            .ring.r4, .ring.r5 { display: none; }
+            .content { padding: 0 22px; }
+            textarea { padding: 16px 18px; }
+        }
+    </style>
 </head>
 <body>
-  <div class="shell">
-    <header>
-      <h1>灵壳 SpiritShell</h1>
-      <p>经本机后端 · Ollama 模型 · 可选 MemPalace 记忆</p>
-    </header>
-    <div class="panel">
-      <div class="meta">
-        <label><input type="checkbox" id="useMemory" checked /> 使用记忆检索</label>
-        <span>状态：<output id="health">…</output></span>
-      </div>
-      <div id="messages" aria-live="polite"></div>
-      <div class="composer">
-        <textarea id="input" rows="2" placeholder="输入消息，Enter 发送，Shift+Enter 换行" autofocus></textarea>
-        <button type="button" class="send" id="send">发送</button>
-      </div>
+
+    <div class="orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+        <div class="orb orb-5"></div>
     </div>
-    <footer>
-      API：<code>/v1/chat</code> · <a href="/docs">OpenAPI</a>
-    </footer>
-  </div>
-  <script>
-    const messagesEl = document.getElementById("messages");
-    const input = document.getElementById("input");
-    const sendBtn = document.getElementById("send");
-    const useMemory = document.getElementById("useMemory");
-    const healthOut = document.getElementById("health");
 
-    /** @type {{role: string, content: string}[]} */
-    let history = [];
+    <div class="ripples">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+        <div class="ring r4"></div>
+        <div class="ring r5"></div>
+    </div>
 
-    async function pingHealth() {
-      try {
-        const r = await fetch("/health");
-        const j = await r.json();
-        healthOut.textContent = j.ok ? `OK · ${j.model}` : "异常";
-      } catch {
-        healthOut.textContent = "无法连接后端";
-      }
-    }
+    <div class="content">
+        <h1 class="hero-title">You can start anywhere.</h1>
+        <p class="hero-sub">
+            此刻有什么<br>
+            说出来就是了
+        </p>
 
-    function appendBubble(role, text, className) {
-      const div = document.createElement("div");
-      div.className = "bubble " + (className || role);
-      div.textContent = text;
-      messagesEl.appendChild(div);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-      return div;
-    }
+        <div class="thread" id="thread" aria-live="polite"></div>
 
-    /** FastAPI HTTPException / validation 的 detail 可能是 string、{error} 或数组 */
-    function formatApiError(data) {
-      const d = data && data.detail;
-      if (d == null) return JSON.stringify(data || {});
-      if (typeof d === "string") return d;
-      if (typeof d.error === "string") return d.error;
-      if (Array.isArray(d))
-        return d.map((x) => (x.msg ? x.msg : JSON.stringify(x))).join("；");
-      return JSON.stringify(d);
-    }
+        <div class="input-wrap">
+            <textarea id="thought" rows="3" autofocus></textarea>
+            <p class="presence">我在</p>
+        </div>
 
-    async function send() {
-      const text = input.value.trim();
-      if (!text) return;
+        <p class="enter-hint">按 Enter 继续 &nbsp;·&nbsp; Shift+Enter 换行</p>
 
-      input.value = "";
-      sendBtn.disabled = true;
-      appendBubble("user", text);
+        <p class="footer-meta">
+            <label><input type="checkbox" id="useMemory" checked /> 记忆检索（MemPalace）</label>
+            · <span id="healthHint">…</span>
+            · <a href="/docs">API</a>
+        </p>
+    </div>
 
-      const payload = {
-        messages: [...history, { role: "user", content: text }],
-        use_memory: useMemory.checked,
-      };
+    <script>
+        const textarea = document.getElementById("thought");
+        const thread = document.getElementById("thread");
+        const useMemory = document.getElementById("useMemory");
+        const healthHint = document.getElementById("healthHint");
 
-      const loadingEl = appendBubble("assistant", "正在生成…（首次调用模型可能需几十秒）", "assistant");
+        const placeholders = [
+            "...",
+            "随便说一句就好",
+            "现在的你，会说什么？"
+        ];
+        let phIndex = 0;
+        let phTimer = null;
 
-      try {
-        const res = await fetch("/v1/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+        function cyclePlaceholder() {
+            textarea.placeholder = "";
+            setTimeout(() => {
+                phIndex = (phIndex + 1) % placeholders.length;
+                textarea.placeholder = placeholders[phIndex];
+                phTimer = setTimeout(cyclePlaceholder, 3800);
+            }, 280);
+        }
+
+        textarea.placeholder = placeholders[0];
+        phTimer = setTimeout(cyclePlaceholder, 3800);
+
+        textarea.addEventListener("input", () => {
+            if (phTimer) { clearTimeout(phTimer); phTimer = null; }
+            textarea.placeholder = "";
+        }, { once: true });
+
+        /** @type {{role: string, content: string}[]} */
+        let history = [];
+        let busy = false;
+
+        async function pingHealth() {
+            try {
+                const r = await fetch("/health");
+                const j = await r.json();
+                healthHint.textContent = j.ok ? j.model : "—";
+            } catch {
+                healthHint.textContent = "未连接";
+            }
+        }
+
+        function formatApiError(data) {
+            const d = data && data.detail;
+            if (d == null) return JSON.stringify(data || {});
+            if (typeof d === "string") return d;
+            if (typeof d.error === "string") return d.error;
+            if (Array.isArray(d))
+                return d.map((x) => (x.msg ? x.msg : JSON.stringify(x))).join("；");
+            return JSON.stringify(d);
+        }
+
+        async function sendMessage(text) {
+            const payload = {
+                messages: [...history, { role: "user", content: text }],
+                use_memory: useMemory.checked,
+            };
+
+            const turn = document.createElement("div");
+            turn.className = "turn";
+            turn.innerHTML =
+                '<p class="user-sentence"></p>' +
+                '<div class="divider"></div>' +
+                '<p class="response pending">正在聆听…（首次可能需几十秒）</p>';
+            turn.querySelector(".user-sentence").textContent = text;
+            const respEl = turn.querySelector(".response");
+            thread.appendChild(turn);
+            thread.scrollIntoView({ behavior: "smooth", block: "end" });
+
+            try {
+                const res = await fetch("/v1/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
+                const raw = await res.text();
+                let data = {};
+                try {
+                    data = raw ? JSON.parse(raw) : {};
+                } catch {
+                    respEl.className = "response err visible";
+                    respEl.textContent = "响应解析失败：" + raw.slice(0, 300);
+                    return;
+                }
+
+                if (!res.ok) {
+                    respEl.className = "response err visible";
+                    respEl.textContent = formatApiError(data);
+                    return;
+                }
+
+                const reply = data.reply != null ? String(data.reply) : "";
+                if (!reply.trim()) {
+                    respEl.className = "response err visible";
+                    respEl.textContent =
+                        "模型返回为空。请检查 ollama list 与 .env 中 OPENAI_MODEL 是否一致。";
+                    return;
+                }
+
+                history.push({ role: "user", content: text });
+                history.push({ role: "assistant", content: reply });
+
+                respEl.className = "response visible";
+                respEl.textContent = reply;
+
+                const mem = data.memory_injected ? "记忆已注入" : "记忆未命中";
+                healthHint.textContent = `${data.memory_status || "ok"} · ${mem}`;
+            } catch (e) {
+                respEl.className = "response err visible";
+                respEl.textContent = e && e.message ? e.message : String(e);
+            }
+        }
+
+        textarea.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                const text = textarea.value.trim();
+                if (!text || busy) return;
+                textarea.value = "";
+                busy = true;
+                sendMessage(text).finally(() => {
+                    busy = false;
+                    textarea.focus();
+                });
+            }
         });
-        const raw = await res.text();
-        let data = {};
-        try {
-          data = raw ? JSON.parse(raw) : {};
-        } catch {
-          loadingEl.remove();
-          appendBubble("assistant", "响应不是合法 JSON：" + raw.slice(0, 200), "error");
-          return;
-        }
 
-        loadingEl.remove();
-
-        if (!res.ok) {
-          appendBubble("assistant", "请求失败：" + formatApiError(data), "error");
-          return;
-        }
-
-        const reply = data.reply != null ? String(data.reply) : "";
-        if (!reply.trim()) {
-          appendBubble(
-            "assistant",
-            "模型返回了空内容。请在本机执行 `ollama list` 确认 OPENAI_MODEL 与之一致，并已 `ollama pull <模型名>`。也可看终端里 uvicorn 的报错。",
-            "error"
-          );
-          return;
-        }
-
-        history.push({ role: "user", content: text });
-        history.push({ role: "assistant", content: reply });
-        appendBubble("assistant", reply);
-
-        const mem = data.memory_injected ? "已注入" : "未命中";
-        healthOut.textContent = `OK · 记忆 ${mem} (${data.memory_status})`;
-      } catch (e) {
-        loadingEl.remove();
-        appendBubble("assistant", "网络错误：" + (e && e.message ? e.message : String(e)), "error");
-      } finally {
-        sendBtn.disabled = false;
-        input.focus();
-      }
-    }
-
-    sendBtn.addEventListener("click", send);
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        send();
-      }
-    });
-
-    pingHealth();
-    setInterval(pingHealth, 30000);
-  </script>
+        pingHealth();
+        setInterval(pingHealth, 30000);
+    </script>
 </body>
 </html>
