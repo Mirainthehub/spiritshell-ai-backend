@@ -2,6 +2,12 @@
 
 Single-page Next.js app that analyzes real-world situations through a **power-dynamics framework** inspired by *The 48 Laws of Power*. It returns structured JSON (power map, hidden dynamics, selected laws, moves, response styles) and renders it as a dark, strategy-tool UI.
 
+## Live demo
+
+**Production (Vercel):** [https://power-lens-vercel.vercel.app](https://power-lens-vercel.vercel.app)
+
+_No API key required for a full UI demo — analysis falls back to built-in mock data._
+
 ## Requirements
 
 - Node.js 18+
@@ -42,6 +48,8 @@ Use [Vercel](https://vercel.com) (free tier is enough for demos).
 1. Sign in with GitHub and confirm import of **Mirainthehub/power-lens**.
 2. Leave defaults (Next.js is auto-detected). Click **Deploy**.
 3. When the build finishes, use the **`.vercel.app`** URL — that is the link you send to friends.
+
+This repo’s maintainer deployment: [power-lens-vercel.vercel.app](https://power-lens-vercel.vercel.app) (example; your fork will get its own subdomain).
 
 **Optional environment variables** (Project → Settings → Environment Variables):
 

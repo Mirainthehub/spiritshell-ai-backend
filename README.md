@@ -112,6 +112,8 @@ mempalace mine data/corpus --wing spiritshell --no-gitignore
 
 **独立仓库**：<https://github.com/Mirainthehub/power-lens>（主开发可在此跟踪 issue / PR）。
 
+**在线演示（Vercel）：** [https://power-lens-vercel.vercel.app](https://power-lens-vercel.vercel.app)
+
 本仓库仍包含同目录快照：[`power-lens/`](power-lens/)（与上面对齐，可用 `git subtree pull` 等方式同步）。
 
 - **详细说明**（安装、环境变量、`/api/analyze`）：见 [`power-lens/README.md`](power-lens/README.md)。
