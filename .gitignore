@@ -7,3 +7,9 @@ venv/
 data/palace/
 .mypy_cache/
 .DS_Store
+
+# Next.js (power-lens)
+power-lens/node_modules/
+power-lens/.next/
+power-lens/out/
+power-lens/.env.local
