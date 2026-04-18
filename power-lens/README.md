@@ -1,75 +1,105 @@
-# Power Lens
+# 🧠 Power Lens
 
-Single-page Next.js app that analyzes real-world situations through a **power-dynamics framework** inspired by *The 48 Laws of Power*. It returns structured JSON (power map, hidden dynamics, selected laws, moves, response styles) and renders it as a dark, strategy-tool UI.
+Describe a situation.  
+Power Lens maps the hidden dynamics — and tells you what actually matters.
 
-## Live demo
+---
 
-**Production (Vercel):** [https://power-lens-vercel.vercel.app](https://power-lens-vercel.vercel.app)
+### ⚡ What it does
 
-_No API key required for a full UI demo — analysis falls back to built-in mock data._
+Most people ask:
 
-## Requirements
+> “What should I do?”
 
-- Node.js 18+
+Power Lens answers:
 
-## Setup
+> “What’s really going on here — and what moves actually change the outcome.”
+
+It analyzes your situation through:
+
+- power dynamics
+- perception vs reality
+- dependency structures
+- hidden incentives
+
+---
+
+### 🎯 Try it in 30 seconds
+
+Example input:
+
+> "I do most of the work in my team, but another colleague gets more recognition. I don’t want conflict, but I don’t want to stay invisible."
+
+→ Power Lens reveals:
+
+- why this is happening
+- what you’re missing
+- what NOT to do
+- concrete strategic moves
+
+---
+
+### 🧩 Why this is different
+
+Most AI tools give advice.
+
+Power Lens:
+
+- reconstructs the situation
+- maps hidden structures
+- surfaces non-obvious leverage points
+
+---
+
+### 🚀 Demo
+
+**Live (Vercel):** [👉 Open Power Lens](https://power-lens-vercel.vercel.app)
+
+_No API key required — analysis can run on built-in demo data._
+
+**Run locally:**
 
 ```bash
+git clone https://github.com/Mirainthehub/power-lens.git
 cd power-lens
 npm install
-```
-
-Copy environment variables (optional for live LLM):
-
-```bash
-cp .env.example .env.local
-# Edit .env.local and add OPENAI_API_KEY if you want live analysis
-```
-
-## Run
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). Optional: `cp .env.example .env.local` and set `OPENAI_API_KEY` for live LLM analysis (OpenAI-compatible API).
 
-- **Without** `OPENAI_API_KEY`, the `/api/analyze` route returns the built-in **demo JSON** (mock), so the UI is fully demonstrable.
-- **With** a key, the app calls your provider’s **OpenAI-compatible** `POST /v1/chat/completions` endpoint.
+**Deploy your own copy:** [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FMirainthehub%2Fpower-lens&project-name=power-lens&repository-name=power-lens)
 
-## Deploy — public link (share with anyone)
+---
 
-Use [Vercel](https://vercel.com) (free tier is enough for demos).
+### 🛠 Built with
 
-### One-click (recommended)
+- Next.js
+- LLM-powered structured analysis
+- Conversation-driven intake engine
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FMirainthehub%2Fpower-lens&project-name=power-lens&repository-name=power-lens)
+---
 
-1. Sign in with GitHub and confirm import of **Mirainthehub/power-lens**.
-2. Leave defaults (Next.js is auto-detected). Click **Deploy**.
-3. When the build finishes, use the **`.vercel.app`** URL — that is the link you send to friends.
+## Developer reference
 
-This repo’s maintainer deployment: [power-lens-vercel.vercel.app](https://power-lens-vercel.vercel.app) (example; your fork will get its own subdomain).
+### Requirements
 
-**Optional environment variables** (Project → Settings → Environment Variables):
+- Node.js 20+ (see `engines` in `package.json`)
 
-| Name | Value |
-|------|--------|
-| `OPENAI_API_KEY` | Omit for **mock-only** analysis (enough for casual testing). |
-| `OPENAI_BASE_URL` | Only if not using default OpenAI (`https://api.openai.com/v1`). |
-| `OPENAI_MODEL` | e.g. `gpt-4o-mini` |
+### Scripts
 
-Redeploy after changing env vars.
+| Command | Description |
+|--------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Run production build |
+| `npm run lint` | ESLint |
+| `npm run intake-cli` | Terminal intake session |
+| `npm run demo-analyze` | Call `/api/analyze` with fixed fixture (needs `npm run dev`) |
 
-### Manual import
+### API: `POST /api/analyze`
 
-1. [Vercel Dashboard](https://vercel.com/dashboard) → **Add New…** → **Project** → Import **Mirainthehub/power-lens**.
-2. **Root Directory**: leave empty (repo root is the Next app).
-3. Deploy.
-
-### POST `/api/analyze`
-
-Request JSON:
+Request body:
 
 ```json
 {
@@ -81,57 +111,23 @@ Request JSON:
 
 Response: `{ result: AnalysisResult, mock?: boolean, message?: string, error?: string }`.
 
-Analysis uses `lib/analysisPrompt.ts`: `buildAnalysisSystemPrompt()` + `buildAnalysisPrompt(intakeState, conversation)` (power dynamics: perception, dependency, threat, narrative, leverage — not a mechanical list of all 48 laws).
+Analysis prompt: `lib/analysisPrompt.ts` (power dynamics: perception, dependency, threat, narrative, leverage — not a mechanical list of all 48 laws).
 
-**Demo script** (start `npm run dev` first):
+### Environment variables
 
-```bash
-npm run demo-analyze
-# optional: POWER_LENS_URL=http://127.0.0.1:3000 POWER_LENS_USE_MOCK=1 npm run demo-analyze
-```
+| Variable | Description |
+|----------|-------------|
+| `OPENAI_API_KEY` | Optional. If empty, responses use mock data. |
+| `OPENAI_BASE_URL` | Default `https://api.openai.com/v1`. |
+| `OPENAI_MODEL` | e.g. `gpt-4o-mini`. |
 
-## Configuration
+### Features (implementation)
 
-| Variable           | Description |
-|--------------------|-------------|
-| `OPENAI_API_KEY`   | Bearer token for the API. If empty, responses use mock data. |
-| `OPENAI_BASE_URL`  | Base URL for the API (default `https://api.openai.com/v1`). |
-| `OPENAI_MODEL`     | Model name (e.g. `gpt-4o-mini`). |
+- **Conversation Intake Engine** (`lib/intake/`): multi-turn, single-question dialogue → structured `IntakeState`.
+- **Lens modes** (Survival, Influence, Diplomacy, Long-term Trust): prompt emphasis server-side.
+- Export analysis JSON; ethical guardrail + uncertainty + missing-information fields in output.
 
-Compatible with any provider that mirrors OpenAI’s chat completions schema (including many local gateways).
-
-## Features
-
-- **Conversation Intake Engine** (`lib/intake/`): multi-turn, **single-question** dialogue that fills a structured `IntakeState` (not a field-by-field form). The UI is chat-only; analysis unlocks when readiness is high enough or after five reply turns.
-- **Lens modes**: Parsed from intake (or defaults) — Survival, Influence, Diplomacy, Long-term Trust — they change prompt emphasis server-side.
-- **Mock / demo**: “Load demo analysis”, or run without an API key.
-- **Export**: Copy or download analysis JSON.
-- **Ethical guardrail** + **uncertainty** + **missing information** sections in the model output.
-
-### Intake engine API (for extension)
-
-- `getNextQuestion(intakeState, conversation, opts?)` → next question or `null` after the optional final sweep.
-- `applyUserReply(state, reply, pendingFieldTarget)` → updated state.
-- `getMissingFields(state)` → priority-ordered gaps.
-- `getReadinessScore(state)` → `{ score, stage }`.
-- `intakeStateToAnalyzeRequest(state)` → legacy flat `AnalyzeRequestBody` (optional helpers only; the app uses `intakeState` + `conversation` for `/api/analyze`).
-
-### CLI demo
-
-Runs a stdin/stdout dialogue (same engine as the web UI):
-
-```bash
-npm run intake-cli
-```
-
-## Scripts
-
-- `npm run dev` — development server  
-- `npm run build` — production build  
-- `npm run start` — run production build  
-- `npm run lint` — ESLint  
-- `npm run intake-cli` — terminal intake session (Ctrl+C or `/quit` to exit)  
-- `npm run demo-analyze` — call `/api/analyze` with fixed intake + transcript (requires `npm run dev`)  
+---
 
 ## Legal / ethical note
 

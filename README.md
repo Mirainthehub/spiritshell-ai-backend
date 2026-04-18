@@ -110,7 +110,9 @@ mempalace mine data/corpus --wing spiritshell --no-gitignore
 
 ## Power Lens（前端子项目）
 
-**独立仓库**：<https://github.com/Mirainthehub/power-lens>（主开发可在此跟踪 issue / PR）。
+**🧠 Power Lens** — Describe a situation; it maps hidden dynamics and strategic leverage（灵感来自《The 48 Laws of Power》式的权力动力学框架，非机械背法条）。
+
+**独立仓库**：<https://github.com/Mirainthehub/power-lens>
 
 **在线演示（Vercel）：** [https://power-lens-vercel.vercel.app](https://power-lens-vercel.vercel.app)
 
