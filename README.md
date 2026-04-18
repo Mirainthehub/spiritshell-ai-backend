@@ -110,7 +110,9 @@ mempalace mine data/corpus --wing spiritshell --no-gitignore
 
 ## Power Lens（前端子项目）
 
-本仓库另含 **Power Lens**：基于 Next.js 的对话式 intake + 权力动力学结构化分析界面，代码在目录 [`power-lens/`](power-lens/)。
+**独立仓库**：<https://github.com/Mirainthehub/power-lens>（主开发可在此跟踪 issue / PR）。
+
+本仓库仍包含同目录快照：[`power-lens/`](power-lens/)（与上面对齐，可用 `git subtree pull` 等方式同步）。
 
 - **详细说明**（安装、环境变量、`/api/analyze`）：见 [`power-lens/README.md`](power-lens/README.md)。
 - **本地运行**：
