@@ -8,6 +8,9 @@ data/palace/
 .mypy_cache/
 .DS_Store
 
+# Standalone personal site (separate git repo; published to GitHub Pages)
+hao-yu-academic-site/
+
 # Next.js (power-lens)
 power-lens/node_modules/
 power-lens/.next/
