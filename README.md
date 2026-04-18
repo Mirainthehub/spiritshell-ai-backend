@@ -108,6 +108,22 @@ mempalace mine data/corpus --wing spiritshell --no-gitignore
 
 本服务默认 **CORS** 允许任意来源（`allow_origins=["*"]`），便于 Pages / 自定义域名调用；上线建议改为明确域名列表并配合鉴权。
 
+## Power Lens（前端子项目）
+
+本仓库另含 **Power Lens**：基于 Next.js 的对话式 intake + 权力动力学结构化分析界面，代码在目录 [`power-lens/`](power-lens/)。
+
+- **详细说明**（安装、环境变量、`/api/analyze`）：见 [`power-lens/README.md`](power-lens/README.md)。
+- **本地运行**：
+
+```bash
+cd power-lens
+npm install
+npm run dev
+# 浏览器打开 http://localhost:3000
+```
+
+Power Lens 为独立 Node 应用，默认不依赖上述 Python `uvicorn` 服务；分析接口在 Next 应用内的 `POST /api/analyze`，可配置 OpenAI 兼容 API 或使用内置 mock。
+
 ## 与灵壳产品的关系
 
 本仓库为自研后端示例；生产环境需自行做脱敏、同意与多租户隔离。
