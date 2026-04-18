@@ -31,6 +31,34 @@ Open [http://localhost:3000](http://localhost:3000).
 - **Without** `OPENAI_API_KEY`, the `/api/analyze` route returns the built-in **demo JSON** (mock), so the UI is fully demonstrable.
 - **With** a key, the app calls your provider’s **OpenAI-compatible** `POST /v1/chat/completions` endpoint.
 
+## Deploy — public link (share with anyone)
+
+Use [Vercel](https://vercel.com) (free tier is enough for demos).
+
+### One-click (recommended)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FMirainthehub%2Fpower-lens&project-name=power-lens&repository-name=power-lens)
+
+1. Sign in with GitHub and confirm import of **Mirainthehub/power-lens**.
+2. Leave defaults (Next.js is auto-detected). Click **Deploy**.
+3. When the build finishes, use the **`.vercel.app`** URL — that is the link you send to friends.
+
+**Optional environment variables** (Project → Settings → Environment Variables):
+
+| Name | Value |
+|------|--------|
+| `OPENAI_API_KEY` | Omit for **mock-only** analysis (enough for casual testing). |
+| `OPENAI_BASE_URL` | Only if not using default OpenAI (`https://api.openai.com/v1`). |
+| `OPENAI_MODEL` | e.g. `gpt-4o-mini` |
+
+Redeploy after changing env vars.
+
+### Manual import
+
+1. [Vercel Dashboard](https://vercel.com/dashboard) → **Add New…** → **Project** → Import **Mirainthehub/power-lens**.
+2. **Root Directory**: leave empty (repo root is the Next app).
+3. Deploy.
+
 ### POST `/api/analyze`
 
 Request JSON:
