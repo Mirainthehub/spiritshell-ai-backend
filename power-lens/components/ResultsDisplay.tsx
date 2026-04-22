@@ -316,8 +316,12 @@ export function ResultsDisplay({
 
           <div>
             <h4 className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-red-400/80">
-              Red flags
+              What to avoid
             </h4>
+            <p className="mb-2 text-[10px] leading-snug text-ink-faint">
+              Anti-patterns and moves that tend to backfire here—not vague “danger”
+              labels.
+            </p>
             <ul className="space-y-1.5">
               {data.redFlags.map((r, i) => (
                 <li

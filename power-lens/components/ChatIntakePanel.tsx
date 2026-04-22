@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { detectResponseLocale } from "@/lib/detectResponseLocale";
 import { getDemoChatBootstrap } from "@/lib/demo-analyze-fixtures";
 import {
   applyUserReply,
@@ -270,7 +271,15 @@ export function ChatIntakePanel({
           </div>
         ) : null}
 
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+          {pendingField === "situation" && !intakeClosed ? (
+            <p className="mb-0 text-[10px] leading-snug text-ink-faint">
+              {detectResponseLocale(intake, messages) === "zh"
+                ? "第一步需要先简要交代事实（大约两三句）。若同一问再次出现，通常是因为信息还偏少——新回复会接在上一条之后叠加，并不是在判对错或故意为难。"
+                : "First step needs a short sketch of facts—about two or three sentences. If the same prompt appears again, your new reply adds to the previous one (we need a bit more detail, not a trick question)."}
+            </p>
+          ) : null}
+          <div className="flex gap-2">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -289,6 +298,7 @@ export function ChatIntakePanel({
           >
             Send
           </button>
+          </div>
         </form>
 
         {canAnalyze && onAnalyze ? (

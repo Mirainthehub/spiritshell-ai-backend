@@ -129,7 +129,19 @@ export function PowerLensApp() {
 
   const handleLoadDemo = () => {
     setError(null);
-    const boot = getDemoChatBootstrap();
+    const boot = getDemoChatBootstrap("zh");
+    setPanelBootstrap(boot);
+    setPanelKey((k) => k + 1);
+    void runAnalyze({
+      useMock: true,
+      intakeOverride: boot.intake,
+      conversationOverride: boot.messages,
+    });
+  };
+
+  const handleLoadDemoEn = () => {
+    setError(null);
+    const boot = getDemoChatBootstrap("en");
     setPanelBootstrap(boot);
     setPanelKey((k) => k + 1);
     void runAnalyze({
@@ -206,7 +218,15 @@ export function PowerLensApp() {
             disabled={loading}
             className="rounded border border-accent/30 bg-accent-glow px-4 py-2 font-mono text-[11px] uppercase tracking-wider text-accent transition hover:border-accent/50 disabled:opacity-50"
           >
-            Load demo
+            Load demo (ZH)
+          </button>
+          <button
+            type="button"
+            onClick={handleLoadDemoEn}
+            disabled={loading}
+            className="rounded border border-accent/30 bg-surface-overlay px-4 py-2 font-mono text-[11px] uppercase tracking-wider text-ink-secondary transition hover:border-accent/35 hover:text-ink-primary disabled:opacity-50"
+          >
+            Load demo (EN)
           </button>
           {result ? (
             <button

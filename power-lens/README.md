@@ -1,63 +1,102 @@
-# 🧠 Power Lens
+# Power Lens
 
-Describe a situation.  
-Power Lens maps the hidden dynamics — and tells you what actually matters.
+**Most problems are not about what you did.**  
+**They’re about how it was perceived.**
 
----
-
-### ⚡ What it does
-
-Most people ask:
-
-> “What should I do?”
-
-Power Lens answers:
-
-> “What’s really going on here — and what moves actually change the outcome.”
-
-It analyzes your situation through:
-
-- power dynamics
-- perception vs reality
-- dependency structures
-- hidden incentives
+Describe a real situation. Power Lens maps who actually has power, what’s really happening, and **what not to do** — so you can move without generic pep talk.
 
 ---
 
-### 🎯 Try it in 30 seconds
+## Why people open this
 
-Example input:
+The hook is not “another AI app.” It’s **a relatable scene + a counter-intuitive read**:
 
-> "I do most of the work in my team, but another colleague gets more recognition. I don’t want conflict, but I don’t want to stay invisible."
+- People think they’re undervalued because they do less work. Often they’re undervalued because **their work never enters the decision-maker’s perception layer**.
+- If someone reacts badly to your idea, it’s often **not about the idea** — it’s about **what they think it says about them** (status, ego, threat).
+- Sometimes **doing more makes things worse** (especially when effort reads as pressure). The lens is **what’s actually happening**, not “try harder.”
 
-→ Power Lens reveals:
-
-- why this is happening
-- what you’re missing
-- what NOT to do
-- concrete strategic moves
+Power Lens doesn’t optimize for “sound wise.” It maps **power dynamics** — perception, dependency, incentives, narrative — so the output is closer to **strategy** than soup.
 
 ---
 
-### 🧩 Why this is different
+## Try this (copy & paste)
 
-Most AI tools give advice.
+Use this in the app as your first situation:
 
-Power Lens:
+```text
+I do most of the work, but someone else gets the credit. I don’t want conflict. What should I do?
+```
 
-- reconstructs the situation
-- maps hidden structures
-- surfaces non-obvious leverage points
+Power Lens will **not** stop at “communicate more.” It pushes toward **attribution, perception, and moves that change the outcome** — including what to avoid.
 
 ---
 
-### 🚀 Demo
+## Demo
 
-**Live (Vercel):** [👉 Open Power Lens](https://power-lens-vercel.vercel.app)
+**Live:** [Open Power Lens on Vercel](https://power-lens-vercel.vercel.app)
 
-_No API key required — analysis can run on built-in demo data._
+Without `OPENAI_API_KEY`, the API still returns structured **demo** analysis so you can click through the flow.
 
-**Run locally:**
+---
+
+### Demo GIF (highly recommended for GitHub)
+
+A short screen recording **~20s** converts visitors who only skim the README:
+
+1. Paste a problem → answer a few intake questions → show the analysis panel.
+2. Export as GIF (e.g. `docs/demo.gif`).
+3. Uncomment or add at the top of this README:
+
+```markdown
+![Power Lens demo](docs/demo.gif)
+```
+
+*No GIF → conversion on GitHub often drops sharply; the product is easier to “get” in motion.*
+
+---
+
+## Same question, different answer
+
+| | |
+|---|------|
+| **Typical AI** | “Communicate more,” “be confident,” “talk to your manager.” |
+| **Power Lens** | Your constraint is often **not effort** but **lack of attribution in the perception layer** — who sees what, who narrates wins, where leverage actually sits. |
+
+That gap is the point.
+
+---
+
+## Build your own strategist
+
+This repo is a **reusable analysis shell**, not a one-off demo:
+
+- Career / visibility strategist  
+- Negotiation or conflict assistant  
+- Relationship dynamics analysis (interpersonal framing — use with care)
+
+Fork or use **Use this template** on GitHub, swap copy, tighten prompts in `lib/analysisPrompt.ts`, ship your own product.
+
+---
+
+## Share snippets (LinkedIn / X / Reddit)
+
+You can paste these as-is or shorten. *For 小红书, translate the hook into Chinese.*
+
+**1 — Workplace (broad reach)**  
+Most people think they’re undervalued because they do less. They’re not. They’re undervalued because their work never enters the decision-maker’s perception. I built a tool that maps who has power, what’s really happening, and what **not** to do — [Power Lens](https://power-lens-vercel.vercel.app) · [GitHub](https://github.com/Mirainthehub/power-lens)
+
+**2 — Ego / status (sharper)**  
+If someone reacts negatively to your idea, it’s often not about the idea — it’s about what they think it says about them. I built a small tool to map threat, leverage, and what actually changes the outcome: [Power Lens](https://power-lens-vercel.vercel.app)
+
+**3 — Relationships (high share)**  
+Sometimes doing more makes things worse — effort can read as pressure. This tool unpacks what’s going on, not “five tips.” [Power Lens](https://power-lens-vercel.vercel.app)
+
+**Reddit title idea:**  
+`I built a tool that analyzes real-life situations using power dynamics instead of generic advice` — good fits: r/Entrepreneur, r/startups, r/careerguidance (follow each sub’s rules).
+
+---
+
+## Run locally
 
 ```bash
 git clone https://github.com/Mirainthehub/power-lens.git
@@ -66,17 +105,23 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Optional: `cp .env.example .env.local` and set `OPENAI_API_KEY` for live LLM analysis (OpenAI-compatible API).
+Open [http://localhost:3000](http://localhost:3000). Optional: `cp .env.example .env.local` and set `OPENAI_API_KEY` for live LLM output (OpenAI-compatible API).
 
-**Deploy your own copy:** [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FMirainthehub%2Fpower-lens&project-name=power-lens&repository-name=power-lens)
+**Deploy:** [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FMirainthehub%2Fpower-lens&project-name=power-lens&repository-name=power-lens)
 
 ---
 
-### 🛠 Built with
+## What “success” might look like
 
-- Next.js
-- LLM-powered structured analysis
-- Conversation-driven intake engine
+Rough anchors for an open-source tool: **~50 stars** = real pull; **~100** = product–message fit; **~300** = distribution working. Stars follow **“I might use this later”** more than **“nice readme”** — so shipping a **GIF demo** and **one real try** matters more than feature count.
+
+---
+
+## Built with
+
+- Next.js  
+- LLM → structured JSON (`AnalysisResult`)  
+- Conversation-driven intake (`lib/intake/`)
 
 ---
 
@@ -95,7 +140,9 @@ Open [http://localhost:3000](http://localhost:3000). Optional: `cp .env.example 
 | `npm run start` | Run production build |
 | `npm run lint` | ESLint |
 | `npm run intake-cli` | Terminal intake session |
-| `npm run demo-analyze` | Call `/api/analyze` with fixed fixture (needs `npm run dev`) |
+| `npm run demo-analyze` | Call `/api/analyze` with a fixture (needs dev server) |
+| `npm run benchmark` | Rule-based regression check against `/api/analyze` |
+| `npm run benchmark:sensitivity` | Same scenario, different `relationshipHorizon` — needs live API key |
 
 ### API: `POST /api/analyze`
 
@@ -111,7 +158,7 @@ Request body:
 
 Response: `{ result: AnalysisResult, mock?: boolean, message?: string, error?: string }`.
 
-Analysis prompt: `lib/analysisPrompt.ts` (power dynamics: perception, dependency, threat, narrative, leverage — not a mechanical list of all 48 laws).
+Analysis prompt: `lib/analysisPrompt.ts` (axes: perception, dependency, threat, narrative, leverage — not a mechanical list of all 48 laws).
 
 ### Environment variables
 
@@ -123,7 +170,7 @@ Analysis prompt: `lib/analysisPrompt.ts` (power dynamics: perception, dependency
 
 ### Features (implementation)
 
-- **Conversation Intake Engine** (`lib/intake/`): multi-turn, single-question dialogue → structured `IntakeState`.
+- **Conversation Intake Engine** (`lib/intake/`): multi-turn dialogue → structured `IntakeState`.
 - **Lens modes** (Survival, Influence, Diplomacy, Long-term Trust): prompt emphasis server-side.
 - Export analysis JSON; ethical guardrail + uncertainty + missing-information fields in output.
 

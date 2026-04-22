@@ -1,5 +1,5 @@
 /** Minimum length before we stop treating `situation` as critically thin. */
-export const MIN_SITUATION_CHARS = 42;
+export const MIN_SITUATION_CHARS = 30;
 
 import type { IntakeFieldKey } from "./types";
 

@@ -4,9 +4,15 @@ import {
   buildAnalysisSystemPrompt,
 } from "@/lib/analysisPrompt";
 import { parseModelJson } from "@/lib/parseJson";
+import { detectResponseLocale } from "@/lib/detectResponseLocale";
 import { MOCK_ANALYSIS } from "@/lib/mock-data";
+import { MOCK_ANALYSIS_EN } from "@/lib/mock-data-en";
 import { normalizeAnalysisResult } from "@/lib/normalize";
 import type { AnalysisResult, AnalyzeApiRequestBody } from "@/lib/types";
+
+function mockForLocale(locale: "zh" | "en"): AnalysisResult {
+  return locale === "zh" ? MOCK_ANALYSIS : MOCK_ANALYSIS_EN;
+}
 
 export const runtime = "nodejs";
 
@@ -85,24 +91,26 @@ export async function POST(req: Request) {
     );
   }
 
+  const locale = detectResponseLocale(body.intakeState, body.conversation);
+
   if (body.useMock) {
-    return NextResponse.json({ result: MOCK_ANALYSIS, mock: true });
+    return NextResponse.json({ result: mockForLocale(locale), mock: true });
   }
 
   const { apiKey } = getEnv();
   if (!apiKey) {
     return NextResponse.json({
-      result: MOCK_ANALYSIS,
+      result: mockForLocale(locale),
       mock: true,
       message: "No OPENAI_API_KEY configured; returned demo analysis.",
     });
   }
 
   const messages = [
-    { role: "system" as const, content: buildAnalysisSystemPrompt() },
+    { role: "system" as const, content: buildAnalysisSystemPrompt(locale) },
     {
       role: "user" as const,
-      content: buildAnalysisPrompt(body.intakeState, body.conversation),
+      content: buildAnalysisPrompt(body.intakeState, body.conversation, locale),
     },
   ];
 
@@ -115,7 +123,7 @@ export async function POST(req: Request) {
     const msg = e instanceof Error ? e.message : String(e);
     return NextResponse.json(
       {
-        result: MOCK_ANALYSIS,
+        result: mockForLocale(locale),
         mock: true,
         error: msg,
         message:

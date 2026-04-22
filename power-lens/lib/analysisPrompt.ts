@@ -1,11 +1,19 @@
 import type { ChatTurn, IntakeState } from "@/lib/intake/types";
 import { parseLensMode, parseTonePreference } from "@/lib/intake/parsePreferences";
+import type { ResponseLocale } from "@/lib/detectResponseLocale";
 
 /**
  * System prompt: power-dynamics framework (not a 48-law recitation).
  * Emphasizes perception, dependency, threat, narrative, leverage.
  */
-export function buildAnalysisSystemPrompt(): string {
+export function buildAnalysisSystemPrompt(locale: ResponseLocale): string {
+  const languageBlock =
+    locale === "zh"
+      ? `## Response language (mandatory)
+The user's intake and dialogue are primarily **Chinese**. Every human-readable string value in the JSON must be in **Simplified Chinese (简体中文)**. Keep JSON **field names** exactly as specified (English). Law \`title\` may stay in English (book titles) or use a short Chinese gloss; all other narrative fields (situationSummary, notes, explanations, recommendations, etc.) must be Chinese.`
+      : `## Response language (mandatory)
+The user's intake and dialogue are primarily **English**. Every human-readable string value in the JSON must be in **English**. Keep JSON field names exactly as specified.`;
+
   return `You are Power Lens — a senior strategic analyst.
 
 You analyze interpersonal and organizational situations using a **power dynamics framework** informed by themes from *The 48 Laws of Power*. You must NOT mechanically list or quote all 48 laws. Select only the few laws that truly illuminate this case.
@@ -24,6 +32,10 @@ You analyze interpersonal and organizational situations using a **power dynamics
 - Flag where manipulation tactics would backfire.
 - uncertaintyNote: state what is uncertain if intake or dialogue is thin.
 - missingInformation: 3–6 concrete questions that would sharpen the map.
+- **redFlags** — Treat as **what to avoid**: concrete anti-patterns, behavioral “don’ts,” and moves that usually backfire in *this* case (not vague worry labels). Many users find this as actionable as “what to do.”
+- **recommendedMoves** — Where it helps, pair **what to try** with **what not to do** (short guardrails in the same prose, not a separate list).
+
+${languageBlock}
 
 ## JSON keys (exact names)
 situationSummary, powerMap (actors, alliances, threats), hiddenDynamics, relevantLaws, strategicDiagnosis, recommendedMoves, responseStyles (exactly three: Soft, Balanced, Hard in that order), redFlags, finalRecommendation, uncertaintyNote, missingInformation, ethicalGuardrailNote
@@ -73,7 +85,13 @@ function formatConversationTranscript(turns: ChatTurn[]): string {
 export function buildAnalysisPrompt(
   intakeState: IntakeState,
   conversation: ChatTurn[],
+  locale: ResponseLocale,
 ): string {
+  const langHint =
+    locale === "zh"
+      ? "Primary language for all narrative fields: **Simplified Chinese**."
+      : "Primary language for all narrative fields: **English**.";
+
   return `## Structured intake (authoritative fields)
 ${formatIntakeBlock(intakeState)}
 
@@ -83,6 +101,8 @@ The user answered a guided intake. Use this to catch nuance, hesitation, and wha
 ${formatConversationTranscript(conversation)}
 
 ---
+
+${langHint}
 
 Produce the analysis JSON. Ground hiddenDynamics and powerMap in the five axes (perception, dependency, threat, narrative, leverage). Laws: few, sharp, case-specific.`;
 }

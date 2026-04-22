@@ -16,3 +16,4 @@ power-lens/node_modules/
 power-lens/.next/
 power-lens/out/
 power-lens/.env.local
+power-lens/tsconfig.tsbuildinfo

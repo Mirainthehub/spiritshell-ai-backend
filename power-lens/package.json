@@ -11,7 +11,10 @@
     "start": "next start",
     "lint": "next lint",
     "intake-cli": "tsx scripts/intake-cli.ts",
-    "demo-analyze": "tsx scripts/demo-analyze.ts"
+    "demo-analyze": "tsx scripts/demo-analyze.ts",
+    "test-api": "tsx scripts/test-api.ts",
+    "benchmark": "tsx scripts/benchmark.ts",
+    "benchmark:sensitivity": "tsx scripts/benchmark-sensitivity.ts"
   },
   "dependencies": {
     "next": "15.5.15",

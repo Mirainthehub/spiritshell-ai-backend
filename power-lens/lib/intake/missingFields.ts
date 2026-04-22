@@ -5,7 +5,8 @@ function isBlank(v: string): boolean {
   return v.trim().length === 0;
 }
 
-function situationIsThin(s: string): boolean {
+/** Exported for intake merge logic when the user sends several short situation replies. */
+export function situationIsThin(s: string): boolean {
   return isBlank(s) || s.trim().length < MIN_SITUATION_CHARS;
 }
 
