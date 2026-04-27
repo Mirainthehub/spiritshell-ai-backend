@@ -164,6 +164,8 @@
     async function run() {
       const text = (qEl.value || "").trim();
       if (!text) {
+        outEl.className = "out err";
+        outEl.textContent = "先写一段话再点 Analyze（可以短，但不能空；如果你已经写了，检查一下是不是都是空格）。";
         qEl.focus();
         return;
       }
