@@ -84,16 +84,30 @@ def settings_dep() -> Settings:
 
 @app.get("/")
 async def chat_ui_root() -> FileResponse:
-    """浏览器入口页（与 API 同源，避免 file:// 跨域）。"""
-    index = STATIC_DIR / "relationship.html"
+    """浏览器入口页：Ququ 单页分析（与 API 同源，避免 file:// 跨域）。"""
+    index = STATIC_DIR / "ququ.html"
     if not index.is_file():
-        raise HTTPException(status_code=404, detail="static/relationship.html missing")
+        raise HTTPException(status_code=404, detail="static/ququ.html missing")
     return FileResponse(index)
 
 
 @app.get("/chat")
 async def chat_ui_alias() -> FileResponse:
     return await chat_ui_root()
+
+
+@app.get("/ququ")
+async def ququ_ui_alias() -> FileResponse:
+    return await chat_ui_root()
+
+
+@app.get("/relationship")
+async def relationship_intake_ui() -> FileResponse:
+    """更完整的关系梳理四步页（旧默认入口，保留为独立路径）。"""
+    index = STATIC_DIR / "relationship.html"
+    if not index.is_file():
+        raise HTTPException(status_code=404, detail="static/relationship.html missing")
+    return FileResponse(index)
 
 
 @app.get("/chat-legacy")

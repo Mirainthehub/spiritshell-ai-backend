@@ -15,13 +15,15 @@
 
 启动后直接打开：
 
-- 新版关系梳理页：<http://127.0.0.1:8080/>
+- **Ququ 单页分析（推荐）**：<http://127.0.0.1:8080/>（同 `/ququ`）
+- **四步关系梳理（更完整）**：<http://127.0.0.1:8080/relationship>
 - 旧版单框对话页：<http://127.0.0.1:8080/chat-legacy>
 
 ## 最近更新（可公开给小范围朋友试用）
 
 - **已部署到 Render（公网可访问）**：<https://spiritshell-ai-backend.onrender.com/>
-  - 关系梳理页：`/`
+  - Ququ 单页分析：`/`（同 `/ququ`）
+  - 四步关系梳理：`/relationship`
   - 旧版单框页：`/chat-legacy`
   - 健康检查：`/health`（应显示 `model` 为你配置的公网模型，例如 `gemini-2.0-flash`）
 - **`Ququ` 已接入 `relationship-ququ-skill` 引用内容**：页面在 `Persona=Ququ` 时会加载 `GET /static/ququ-skill.md` 并注入 system prompt（避免“只写个开关名”的假 Ququ）。
@@ -102,7 +104,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
 
 **浏览器页面**（与后端同源，直接调 `/v1/chat`；视觉对齐 [spiritshell.org/experience-entry](http://spiritshell.org/experience-entry.html)）：
 
-- 打开：<http://127.0.0.1:8080/>（关系梳理）或 <http://127.0.0.1:8080/chat-legacy>（旧版对话）
+- 打开：<http://127.0.0.1:8080/>（Ququ 单页）或 <http://127.0.0.1:8080/relationship>（四步梳理）或 <http://127.0.0.1:8080/chat-legacy>（旧版对话）
 
 命令行测试：
 

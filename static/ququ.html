@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ququ 视角分析 · SpiritShell</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", sans-serif;
+      background: #fdfcff;
+      color: rgba(28, 20, 52, 0.86);
+    }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 28px 18px 40px; }
+    h1 { font-size: 22px; font-weight: 500; margin: 0 0 8px; }
+    p.sub { margin: 0 0 18px; color: rgba(90, 75, 130, 0.55); line-height: 1.8; font-size: 14px; }
+    .card {
+      border: 1px solid rgba(140, 120, 200, 0.16);
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 2px 20px rgba(104, 99, 248, 0.06);
+    }
+    label { display: block; font-size: 12px; color: rgba(90, 75, 130, 0.55); margin: 10px 0 6px; }
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      border-radius: 14px;
+      border: 1px solid rgba(140, 120, 200, 0.18);
+      padding: 12px 12px;
+      font-size: 15px;
+      line-height: 1.75;
+      outline: none;
+      resize: vertical;
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-top: 12px; }
+    .left { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .btn {
+      border: 1px solid rgba(104, 99, 248, 0.26);
+      background: rgba(104, 99, 248, 0.12);
+      color: rgba(45, 35, 92, 0.85);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn.secondary { background: rgba(255, 255, 255, 0.6); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: rgba(90, 75, 130, 0.55); }
+    .out {
+      margin-top: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.9;
+      font-size: 14px;
+      color: rgba(28, 20, 52, 0.9);
+    }
+    .out.pending { color: rgba(120, 100, 170, 0.45); font-style: italic; }
+    .out.err { color: rgba(160, 60, 80, 0.9); font-style: normal; }
+    .note { margin-top: 10px; font-size: 12px; line-height: 1.8; color: rgba(90, 75, 130, 0.55); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Ququ 视角分析（加载 relationship-ququ-skill）</h1>
+    <p class="sub">
+      你只要写清楚情况，点一次按钮。页面会自动加载 <span class="mono">/static/ququ-skill.md</span> 并把它注入到 system prompt。
+      这不是聊天机器人，更像“分析框架 + 建议”。请勿输入敏感隐私信息。
+    </p>
+
+    <div class="card">
+      <label for="q">你想让 Ta 怎么帮你看？（把背景、关系阶段、你卡住的点写清楚）</label>
+      <textarea id="q" placeholder="例：我们暧昧了两个月，我投入很多情绪但他一直不确定关系。最近更冷。我想知道这段关系里谁在亏、我该怎么选。"></textarea>
+
+      <div class="row">
+        <div class="left">
+          <label style="display:flex;align-items:center;gap:8px;margin:0;">
+            <input id="useMemory" type="checkbox" />
+            <span>记忆检索（一般建议关，减少干扰）</span>
+          </label>
+        </div>
+        <div class="left">
+          <button id="run" class="btn" type="button">Analyze</button>
+          <button id="clear" class="btn secondary" type="button">Clear</button>
+        </div>
+      </div>
+
+      <p class="note">
+        如果你看到 <span class="mono">429</span>：这是模型额度/限流问题，等 1 分钟再试，或到 Google AI Studio 换 key / 开额度 / 换模型名。
+      </p>
+
+      <div id="out" class="out pending">还没有开始。</div>
+    </div>
+  </div>
+
+  <script>
+    const qEl = document.getElementById("q");
+    const outEl = document.getElementById("out");
+    const useMemoryEl = document.getElementById("useMemory");
+    const runBtn = document.getElementById("run");
+    const clearBtn = document.getElementById("clear");
+
+    let skill = "";
+    let busy = false;
+
+    async function loadSkill() {
+      if (skill.trim()) return;
+      const res = await fetch("/static/ququ-skill.md", { cache: "force-cache" });
+      if (!res.ok) throw new Error("无法加载 ququ-skill.md（/static 未配置或文件缺失）");
+      const text = await res.text();
+      // 控制 prompt 大小，减少 429/输入 token 风险
+      skill = String(text || "").slice(0, 12000);
+    }
+
+    function buildSystemPrompt() {
+      return [
+        "你是“曲曲大女人（乐传曲）思维视角顾问”的模拟器。",
+        "你的任务：用 value-exchange / 风险厌恶 / 资产化 / 雄竞雌竞分流 等框架，帮用户做关系利益结构分析。",
+        "强约束：",
+        "- 不鼓励非法、欺诈、操控、跟踪、骚扰、威胁、冷暴力。",
+        "- 不羞辱用户，不做人身攻击。",
+        "- 不要逐字背诵 skill 文本；抓 HOW she thinks。",
+        "",
+        "输出格式（中文）：",
+        "1) 一句结论（很直接）",
+        "2) 关系结构：双方各自提供什么 / 谁更亏 / 风险点",
+        "3) 如果你要继续：3 条可执行行动（含边界）",
+        "4) 如果你要止损：3 条可执行行动（含体面话术方向）",
+        "5) 3 个你必须补充的问题（用来把分析变准）",
+        "",
+        "——以下为 ququ-skill 原文摘录（供对齐，不要原样照抄大段）——",
+        skill.trim() || "(skill 未加载)",
+        "——ququ-skill 结束——"
+      ].join("\n");
+    }
+
+    function formatError(data) {
+      const d = data && data.detail;
+      if (d == null) return JSON.stringify(data || {});
+      if (typeof d === "string") return d;
+      if (typeof d === "object" && d && typeof d.error === "string") return d.error;
+      try { return JSON.stringify(d); } catch { return String(d); }
+    }
+
+    async function run() {
+      const text = (qEl.value || "").trim();
+      if (!text) {
+        qEl.focus();
+        return;
+      }
+      if (busy) return;
+      busy = true;
+      runBtn.disabled = true;
+      clearBtn.disabled = true;
+      outEl.className = "out pending";
+      outEl.textContent = "分析中…（如果很久，多半是模型冷启动/限流）";
+      try {
+        await loadSkill();
+        const payload = {
+          messages: [
+            { role: "system", content: buildSystemPrompt() },
+            { role: "user", content: text }
+          ],
+          use_memory: !!useMemoryEl.checked
+        };
+        const res = await fetch("/v1/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const raw = await res.text();
+        let data = {};
+        try { data = raw ? JSON.parse(raw) : {}; } catch {
+          outEl.className = "out err";
+          outEl.textContent = "响应解析失败：" + raw.slice(0, 600);
+          return;
+        }
+        if (!res.ok) {
+          outEl.className = "out err";
+          outEl.textContent = formatError(data) || raw.slice(0, 800);
+          return;
+        }
+        const reply = data.reply != null ? String(data.reply) : "";
+        if (!reply.trim()) {
+          outEl.className = "out err";
+          outEl.textContent = "模型返回为空。";
+          return;
+        }
+        outEl.className = "out";
+        outEl.textContent = reply;
+      } catch (e) {
+        outEl.className = "out err";
+        outEl.textContent = e && e.message ? e.message : String(e);
+      } finally {
+        busy = false;
+        runBtn.disabled = false;
+        clearBtn.disabled = false;
+      }
+    }
+
+    runBtn.addEventListener("click", run);
+    clearBtn.addEventListener("click", () => {
+      qEl.value = "";
+      outEl.className = "out pending";
+      outEl.textContent = "还没有开始。";
+    });
+  </script>
+</body>
+</html>
