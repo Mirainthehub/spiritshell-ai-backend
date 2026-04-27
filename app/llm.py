@@ -23,7 +23,7 @@ async def chat_completions(
     payload = {
         "model": settings.openai_model,
         "messages": messages,
-        "temperature": 0.7,
+        "temperature": float(settings.chat_temperature),
     }
     headers = {
         "Authorization": f"Bearer {key}",

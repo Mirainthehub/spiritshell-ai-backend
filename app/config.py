@@ -17,6 +17,12 @@ class Settings(BaseSettings):
         default="llama3.2",
         validation_alias=AliasChoices("OPENAI_MODEL", "GEMINI_MODEL"),
     )
+    chat_temperature: float = Field(
+        default=0.7,
+        ge=0.0,
+        le=2.0,
+        validation_alias=AliasChoices("CHAT_TEMPERATURE", "OPENAI_TEMPERATURE"),
+    )
 
     mempalace_palace_path: str = Field(default="", validation_alias="MEMPALACE_PALACE_PATH")
     mempalace_default_wing: str | None = Field(default=None, validation_alias="MEMPALACE_DEFAULT_WING")
