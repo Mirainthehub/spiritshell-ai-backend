@@ -2,6 +2,22 @@
 
 **默认对接本机 Ollama**（OpenAI 兼容 `chat/completions`）+ 轻量安全校验 + **MemPalace** 语义记忆（RAG）。
 
+## 新增：关系梳理网页（更适合女生使用）
+
+这不是“聊天机器人”，而是一个**把关系困扰拆成 4 步**的小工具：先把事实说清，再把需求与边界对齐，最后给你**三种语气**的可执行建议。
+
+- **四步梳理**：事实 → 你要什么 → 底线 → 下一步对话目标
+- **三种输出**：温柔 / 理性 / 直接（可切换）
+- **强度可调**：`Directness 0–100`（越高越直白，但仍保持尊重）
+- **可选视角**：`Persona Friendly / Ququ`（Ququ 更结构化、更强调边界与成本，但不羞辱、不攻击）
+- **同源调用**：网页直接请求本后端 `POST /v1/chat`，无需单独前端构建
+- **隐私默认**：页面不做持久化存储（刷新即清空），请勿输入身份证号/地址等敏感信息
+
+启动后直接打开：
+
+- 新版关系梳理页：<http://127.0.0.1:8080/>
+- 旧版单框对话页：<http://127.0.0.1:8080/chat-legacy>
+
 ## 架构
 
 1. **对话**：`POST /v1/chat` → `OPENAI_BASE_URL`（默认 `http://127.0.0.1:11434/v1`）的 `chat/completions`。
@@ -48,9 +64,9 @@ chmod +x scripts/bootstrap_memory.sh
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
 ```
 
-**浏览器对话页**（与后端同源，直接调 `/v1/chat`；视觉对齐 [spiritshell.org/experience-entry](http://spiritshell.org/experience-entry.html)）：
+**浏览器页面**（与后端同源，直接调 `/v1/chat`；视觉对齐 [spiritshell.org/experience-entry](http://spiritshell.org/experience-entry.html)）：
 
-- 打开：<http://127.0.0.1:8080/> 或 <http://127.0.0.1:8080/chat>
+- 打开：<http://127.0.0.1:8080/>（关系梳理）或 <http://127.0.0.1:8080/chat-legacy>（旧版对话）
 
 命令行测试：
 
