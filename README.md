@@ -18,6 +18,42 @@
 - 新版关系梳理页：<http://127.0.0.1:8080/>
 - 旧版单框对话页：<http://127.0.0.1:8080/chat-legacy>
 
+## 最近更新（可公开给小范围朋友试用）
+
+- **已部署到 Render（公网可访问）**：<https://spiritshell-ai-backend.onrender.com/>
+  - 关系梳理页：`/`
+  - 旧版单框页：`/chat-legacy`
+  - 健康检查：`/health`（应显示 `model` 为你配置的公网模型，例如 `gemini-2.0-flash`）
+- **`Ququ` 已接入 `relationship-ququ-skill` 引用内容**：页面在 `Persona=Ququ` 时会加载 `GET /static/ququ-skill.md` 并注入 system prompt（避免“只写个开关名”的假 Ququ）。
+- **静态资源**：`GET /static/*` 由 FastAPI `StaticFiles` 提供（用于 skill 文件等）。
+
+### Render 免费档提醒
+- **冷启动**：一段时间无人访问会休眠，朋友第一次打开可能要等几十秒。
+- **模型费用/额度**：公网模型 key 在你的账号侧计费/计额度；公开链接意味着他人使用也会消耗。
+
+### Render 部署（最短配置）
+在 Render 创建 **Web Service**（不要选 Blueprint）：
+
+- **Root Directory**：空或 `.`
+- **Build Command**：
+
+```bash
+pip install -r requirements.txt
+```
+
+- **Start Command**：
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+- **Environment Variables（示例：Gemini OpenAI 兼容）**：
+  - `OPENAI_BASE_URL` = `https://generativelanguage.googleapis.com/v1beta/openai`
+  - `OPENAI_API_KEY` = 你的 Google AI Studio key
+  - `OPENAI_MODEL` = `gemini-2.0-flash`
+  - `MEMORY_OPTIONAL` = `true`
+  - `MEMPALACE_PALACE_PATH` 留空（线上通常没有本地 palace 数据）
+
 ## 架构
 
 1. **对话**：`POST /v1/chat` → `OPENAI_BASE_URL`（默认 `http://127.0.0.1:11434/v1`）的 `chat/completions`。
