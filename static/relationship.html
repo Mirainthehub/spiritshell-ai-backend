@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>关系梳理 · SpiritShell</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", sans-serif;
+      background: #fdfcff;
+      color: rgba(28, 20, 52, 0.86);
+      overflow-x: hidden;
+    }
+
+    /* background orbs */
+    .orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .orb { position: absolute; border-radius: 999px; filter: blur(90px); }
+    .orb-1 { width: 720px; height: 720px; top: -30%; left: -20%;
+      background: radial-gradient(circle, rgba(9,158,241,0.22) 0%, transparent 60%);
+      animation: drift-1 26s ease-in-out infinite;
+    }
+    .orb-2 { width: 600px; height: 600px; top: -20%; right: -18%;
+      background: radial-gradient(circle, rgba(104,99,248,0.20) 0%, transparent 60%);
+      animation: drift-2 22s ease-in-out infinite;
+    }
+    .orb-3 { width: 640px; height: 640px; bottom: -25%; left: 50%; transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(240,88,197,0.18) 0%, transparent 60%);
+      animation: drift-3 30s ease-in-out infinite;
+    }
+    .orb-4 { width: 420px; height: 420px; bottom: -12%; right: -8%;
+      background: radial-gradient(circle, rgba(255,137,31,0.12) 0%, transparent 60%);
+      animation: drift-4 18s ease-in-out infinite;
+    }
+    @keyframes drift-1 { 0%,100% { transform: translate(0,0); } 40% { transform: translate(40px,50px);} 70%{transform:translate(-20px,30px);} }
+    @keyframes drift-2 { 0%,100% { transform: translate(0,0); } 35% { transform: translate(-35px,40px);} 70%{transform:translate(15px,20px);} }
+    @keyframes drift-3 { 0%,100% { transform: translateX(-50%) translate(0,0);} 50%{transform:translateX(-50%) translate(30px,-30px);} }
+    @keyframes drift-4 { 0%,100% { transform: translate(0,0);} 50%{transform:translate(-25px,-35px);} }
+
+    .wrap { position: relative; z-index: 1; min-height: 100dvh; display: flex; justify-content: center; padding: 28px 18px 40px; }
+    .shell { width: 100%; max-width: 880px; }
+
+    .top {
+      display: flex; gap: 14px; align-items: flex-end; justify-content: space-between;
+      padding: 10px 4px 18px; border-bottom: 1px solid rgba(140,120,200,0.14);
+      margin-bottom: 18px;
+    }
+    .brand { display: flex; flex-direction: column; gap: 6px; }
+    .kicker { font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase; color: rgba(104,99,248,0.75); }
+    .title { font-size: clamp(1.3rem, 3.4vw, 1.85rem); font-weight: 400; letter-spacing: 0.01em; }
+    .sub { font-size: 0.92rem; font-weight: 300; line-height: 1.9; color: rgba(90,75,130,0.52); max-width: 48ch; }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; align-items: center; }
+    .pill {
+      border: 1px solid rgba(140,120,200,0.18);
+      background: rgba(255,255,255,0.62);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 999px;
+      padding: 8px 10px;
+      box-shadow: 0 2px 18px rgba(104,99,248,0.05);
+    }
+    .seg { display: inline-flex; border-radius: 999px; overflow: hidden; border: 1px solid rgba(140,120,200,0.14); }
+    .seg button {
+      border: 0; background: transparent; padding: 8px 10px;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(90,75,130,0.58); cursor: pointer;
+    }
+    .seg button.active { background: rgba(104,99,248,0.10); color: rgba(45,35,92,0.85); }
+    .seg button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .row { display: flex; align-items: center; gap: 10px; }
+    .label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(90,75,130,0.46); }
+    input[type="range"] { width: 180px; }
+    .value { font-size: 12px; color: rgba(45,35,92,0.70); min-width: 28px; text-align: right; }
+
+    .grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 14px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      border: 1px solid rgba(140,120,200,0.16);
+      background: rgba(255,255,255,0.70);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 18px;
+      box-shadow: 0 2px 24px rgba(104,99,248,0.06);
+      overflow: hidden;
+    }
+    .card-hd { padding: 16px 16px 12px; border-bottom: 1px solid rgba(140,120,200,0.12); display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+    .card-hd h2 { margin: 0; font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(45,35,92,0.72); }
+    .hint { font-size: 12px; color: rgba(90,75,130,0.46); }
+    .card-bd { padding: 14px 16px 16px; }
+
+    textarea {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(140,120,200,0.18);
+      background: rgba(255,255,255,0.82);
+      padding: 14px 14px;
+      font-size: 0.98rem;
+      font-weight: 300;
+      line-height: 1.75;
+      outline: none;
+      resize: vertical;
+      min-height: 120px;
+      color: rgba(28, 20, 52, 0.86);
+      box-shadow: 0 2px 18px rgba(104,99,248,0.05);
+    }
+    textarea:focus { border-color: rgba(104,99,248,0.28); box-shadow: 0 0 0 3px rgba(104,99,248,0.08), 0 4px 22px rgba(104,99,248,0.10); }
+    textarea::placeholder { color: rgba(120,105,165,0.38); font-style: italic; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip {
+      border: 1px solid rgba(140,120,200,0.16);
+      background: rgba(255,255,255,0.65);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: rgba(45,35,92,0.70);
+      cursor: pointer;
+      user-select: none;
+    }
+    .chip:hover { border-color: rgba(104,99,248,0.28); }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(104,99,248,0.26);
+      background: rgba(104,99,248,0.12);
+      color: rgba(45,35,92,0.85);
+      padding: 10px 14px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .btn.primary { background: rgba(9,158,241,0.12); border-color: rgba(9,158,241,0.26); }
+    .btn.ghost { background: rgba(255,255,255,0.55); border-color: rgba(140,120,200,0.18); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .steps { display: flex; gap: 8px; flex-wrap: wrap; }
+    .step {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid rgba(140,120,200,0.14);
+      background: rgba(255,255,255,0.55);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: rgba(90,75,130,0.52);
+    }
+    .step strong { color: rgba(45,35,92,0.78); font-weight: 500; }
+    .privacy { margin-top: 10px; font-size: 12px; line-height: 1.75; color: rgba(90,75,130,0.46); }
+    .privacy code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; background: rgba(104,99,248,0.08); padding: 2px 6px; border-radius: 8px; }
+
+    .out { white-space: pre-wrap; word-break: break-word; line-height: 2.0; font-size: 0.98rem; font-weight: 300; color: rgba(28, 20, 52, 0.86); }
+    .out.pending { color: rgba(120,100,170,0.48); font-style: italic; }
+    .out.err { color: rgba(160,60,80,0.85); font-style: normal; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .tab { border: 1px solid rgba(140,120,200,0.16); background: rgba(255,255,255,0.58); border-radius: 999px; padding: 8px 10px; cursor: pointer; font-size: 12px; color: rgba(90,75,130,0.58); }
+    .tab.active { border-color: rgba(104,99,248,0.28); background: rgba(104,99,248,0.10); color: rgba(45,35,92,0.85); }
+  </style>
+</head>
+<body>
+  <div class="orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="shell">
+      <div class="top">
+        <div class="brand">
+          <div class="kicker">SpiritShell</div>
+          <div class="title">关系梳理 · 清晰但不伤人</div>
+          <div class="sub">先把事实、边界、期待说清楚。再给你 3 种版本的建议：温柔 / 理性 / 直接。</div>
+        </div>
+        <div class="controls">
+          <div class="pill">
+            <div class="row">
+              <span class="label">Persona</span>
+              <div class="seg" role="tablist" aria-label="persona">
+                <button id="personaFriendly" class="active" type="button">Friendly</button>
+                <button id="personaQuqu" type="button">Ququ</button>
+              </div>
+            </div>
+          </div>
+          <div class="pill">
+            <div class="row">
+              <span class="label">Directness</span>
+              <input id="directness" type="range" min="0" max="100" step="5" value="35" />
+              <span id="directnessVal" class="value">35</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-hd">
+            <h2>梳理</h2>
+            <div class="hint"><span id="health">…</span></div>
+          </div>
+          <div class="card-bd">
+            <div class="steps" aria-label="steps">
+              <div class="step"><strong>1</strong> 事实</div>
+              <div class="step"><strong>2</strong> 你要什么</div>
+              <div class="step"><strong>3</strong> 底线</div>
+              <div class="step"><strong>4</strong> 下一步对话</div>
+            </div>
+
+            <textarea id="input" placeholder="先用两三句话说事实：你们是什么关系？最近发生了什么？你卡在哪一步？"></textarea>
+            <div class="chips" id="chips"></div>
+
+            <div class="actions">
+              <button id="next" class="btn primary" type="button">Next</button>
+              <button id="demo" class="btn ghost" type="button">Demo</button>
+              <button id="reset" class="btn ghost" type="button">Reset</button>
+              <label class="btn ghost" style="display:inline-flex;align-items:center;gap:8px;">
+                <input id="useMemory" type="checkbox" checked />
+                <span style="letter-spacing:0.08em;text-transform:none;">记忆检索</span>
+              </label>
+            </div>
+
+            <div class="privacy">
+              默认不保存内容；刷新即清空。避免输入身份证号、地址、联系方式等敏感信息。<br/>
+              模型调用：<code>POST /v1/chat</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd">
+            <h2>建议</h2>
+            <div class="hint">三种语气可切换</div>
+          </div>
+          <div class="card-bd">
+            <div class="tabs">
+              <button class="tab active" id="tabSoft" type="button">温柔</button>
+              <button class="tab" id="tabBalanced" type="button">理性</button>
+              <button class="tab" id="tabHard" type="button">直接</button>
+            </div>
+            <div id="output" class="out pending">还没开始。右侧会在你完成梳理后输出。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const inputEl = document.getElementById("input");
+    const outputEl = document.getElementById("output");
+    const chipsEl = document.getElementById("chips");
+    const healthEl = document.getElementById("health");
+    const useMemoryEl = document.getElementById("useMemory");
+    const directnessEl = document.getElementById("directness");
+    const directnessValEl = document.getElementById("directnessVal");
+    const personaFriendlyEl = document.getElementById("personaFriendly");
+    const personaQuquEl = document.getElementById("personaQuqu");
+
+    const tabSoft = document.getElementById("tabSoft");
+    const tabBalanced = document.getElementById("tabBalanced");
+    const tabHard = document.getElementById("tabHard");
+
+    const state = {
+      step: 0,
+      persona: "Friendly",
+      directness: 35,
+      fields: {
+        facts: "",
+        goal: "",
+        boundary: "",
+        nextTalk: ""
+      },
+      outputs: { Soft: "", Balanced: "", Hard: "" },
+      activeTab: "Soft",
+      busy: false,
+      history: []
+    };
+
+    const steps = [
+      {
+        key: "facts",
+        placeholder: "先用两三句话说事实：你们是什么关系？最近发生了什么？你卡在哪一步？",
+        chips: ["暧昧一段时间，他忽冷忽热", "已经恋爱/同居，但最近变冷", "分手后复合拉扯", "相亲认识，节奏不一致"]
+      },
+      {
+        key: "goal",
+        placeholder: "你最想要的结果是什么？（继续推进/确认关系/修复/止损/拿回自尊）",
+        chips: ["要么推进关系要么止损", "希望他明确承诺", "想减少内耗、稳定自己", "想知道他到底在不在乎"]
+      },
+      {
+        key: "boundary",
+        placeholder: "你的底线/红线是什么？哪些事你不能接受？（比如失联、辱骂、暧昧不清、出轨、冷暴力）",
+        chips: ["不能接受失联", "不能接受暧昧不清", "不能接受辱骂/贬低", "不能接受长期不见面"]
+      },
+      {
+        key: "nextTalk",
+        placeholder: "如果你愿意，你希望下一次对话达到什么？（一句话）例如：‘确认我们是不是排他’",
+        chips: ["确认是否排他", "确认未来一个月节奏", "确认他是否愿意认真发展", "把我的边界说清楚"]
+      }
+    ];
+
+    function setBusy(v) {
+      state.busy = v;
+      document.getElementById("next").disabled = v;
+      document.getElementById("demo").disabled = v;
+      document.getElementById("reset").disabled = v;
+      personaFriendlyEl.disabled = v;
+      personaQuquEl.disabled = v;
+      directnessEl.disabled = v;
+      useMemoryEl.disabled = v;
+    }
+
+    function renderChips() {
+      chipsEl.innerHTML = "";
+      const c = steps[state.step].chips || [];
+      for (const text of c) {
+        const b = document.createElement("div");
+        b.className = "chip";
+        b.textContent = text;
+        b.addEventListener("click", () => {
+          inputEl.value = text;
+          inputEl.focus();
+        });
+        chipsEl.appendChild(b);
+      }
+    }
+
+    function updateTabUI() {
+      const map = { Soft: tabSoft, Balanced: tabBalanced, Hard: tabHard };
+      Object.entries(map).forEach(([k, el]) => {
+        if (k === state.activeTab) el.classList.add("active");
+        else el.classList.remove("active");
+      });
+      const text = state.outputs[state.activeTab] || "";
+      if (!text.trim()) {
+        outputEl.className = "out pending";
+        outputEl.textContent = "还没开始。右侧会在你完成梳理后输出。";
+      } else {
+        outputEl.className = "out";
+        outputEl.textContent = text;
+      }
+    }
+
+    function setPersona(p) {
+      state.persona = p;
+      if (p === "Friendly") {
+        personaFriendlyEl.classList.add("active");
+        personaQuquEl.classList.remove("active");
+      } else {
+        personaFriendlyEl.classList.remove("active");
+        personaQuquEl.classList.add("active");
+      }
+    }
+
+    function setDirectness(v) {
+      state.directness = v;
+      directnessValEl.textContent = String(v);
+    }
+
+    function resetAll() {
+      state.step = 0;
+      state.fields.facts = "";
+      state.fields.goal = "";
+      state.fields.boundary = "";
+      state.fields.nextTalk = "";
+      state.outputs.Soft = "";
+      state.outputs.Balanced = "";
+      state.outputs.Hard = "";
+      state.history = [];
+      inputEl.value = "";
+      inputEl.placeholder = steps[0].placeholder;
+      renderChips();
+      updateTabUI();
+    }
+
+    function buildSystemPrompt() {
+      const directness = state.directness;
+      const persona = state.persona;
+      const directnessRule =
+        directness <= 25 ? "非常温柔、支持、少结论，多陪伴与边界。"
+        : directness <= 60 ? "清晰但不苛刻：给结构化判断与可执行下一步。"
+        : "非常直接但不羞辱：明确指出结构问题与止损条件。";
+
+      const personaRule = persona === "Ququ"
+        ? "风格偏商业化/结构化：强调价值交换、边界、成本、时间线；结论先行、短句。但禁止贬低、羞辱、骂人、PUA、受害者指责。"
+        : "风格温柔但理性：先承接情绪，再给清晰结构与边界，不站队、不羞辱。";
+
+      return [
+        "你是一个关系梳理与决策辅助助手（面向女性用户更友好）。",
+        "目标：帮助用户从事实→需求→边界→下一步行动，减少内耗，提升安全感与自尊。",
+        "硬性要求：不鼓励操控、欺骗、跟踪、骚扰、羞辱、冷暴力、威胁或任何伤害。遇到暴力/胁迫/未成年/性安全风险要优先提示安全与求助。",
+        `输出强度规则（directness=${directness}/100）：${directnessRule}`,
+        `风格规则（persona=${persona}）：${personaRule}`,
+        "",
+        "请只用中文输出，并按下面格式生成三段内容（每段以标题开头）：",
+        "【温柔版】…",
+        "【理性版】…",
+        "【直接版】…",
+        "",
+        "每段都必须包含：",
+        "1）一句话总结（<=25字）",
+        "2）你看到的结构（2-4条要点）",
+        "3）下一步行动（3条，具体到一句话）",
+        "4）一句可复制的话术（1-2句）",
+        "5）需要补充的关键信息（3个问题）"
+      ].join("\\n");
+    }
+
+    function buildUserPrompt() {
+      const f = state.fields;
+      return [
+        "以下是用户给的梳理信息：",
+        `- 事实：${f.facts || "(空)"}`,
+        `- 你要的结果：${f.goal || "(空)"}`,
+        `- 底线/红线：${f.boundary || "(空)"}`,
+        `- 下一次对话目标：${f.nextTalk || "(空)"}`,
+        "",
+        "请基于这些信息输出三种版本建议（温柔/理性/直接）。",
+        "注意：不要写成鸡汤，不要‘你去沟通就好了’这种空话；要给具体可执行动作。"
+      ].join("\\n");
+    }
+
+    function parseThreeBlocks(text) {
+      const out = { Soft: "", Balanced: "", Hard: "" };
+      const t = String(text || "");
+      const iSoft = t.indexOf("【温柔版】");
+      const iBal = t.indexOf("【理性版】");
+      const iHard = t.indexOf("【直接版】");
+      if (iSoft === -1 || iBal === -1 || iHard === -1) {
+        // fallback: return whole text into Balanced
+        out.Balanced = t.trim();
+        return out;
+      }
+      const seg = (a, b) => t.slice(a, b).trim();
+      out.Soft = seg(iSoft, iBal);
+      out.Balanced = seg(iBal, iHard);
+      out.Hard = seg(iHard, t.length);
+      return out;
+    }
+
+    async function pingHealth() {
+      try {
+        const r = await fetch("/health");
+        const j = await r.json();
+        healthEl.textContent = j.ok ? j.model : "—";
+      } catch {
+        healthEl.textContent = "未连接";
+      }
+    }
+
+    async function runAnalysis() {
+      setBusy(true);
+      outputEl.className = "out pending";
+      outputEl.textContent = "正在梳理…（首次可能需要几十秒）";
+      try {
+        const payload = {
+          messages: [
+            { role: "system", content: buildSystemPrompt() },
+            ...state.history,
+            { role: "user", content: buildUserPrompt() }
+          ],
+          use_memory: !!useMemoryEl.checked
+        };
+        const res = await fetch("/v1/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const raw = await res.text();
+        let data = {};
+        try { data = raw ? JSON.parse(raw) : {}; } catch {
+          outputEl.className = "out err";
+          outputEl.textContent = "响应解析失败：" + raw.slice(0, 400);
+          return;
+        }
+        if (!res.ok) {
+          outputEl.className = "out err";
+          outputEl.textContent = (data && data.detail && data.detail.error) ? data.detail.error : raw.slice(0, 400);
+          return;
+        }
+        const reply = data.reply != null ? String(data.reply) : "";
+        if (!reply.trim()) {
+          outputEl.className = "out err";
+          outputEl.textContent = "模型返回为空。请检查 OPENAI_MODEL 与模型服务。";
+          return;
+        }
+        // update history for continuity
+        state.history.push({ role: "user", content: buildUserPrompt() });
+        state.history.push({ role: "assistant", content: reply });
+
+        const blocks = parseThreeBlocks(reply);
+        state.outputs.Soft = blocks.Soft;
+        state.outputs.Balanced = blocks.Balanced;
+        state.outputs.Hard = blocks.Hard;
+        updateTabUI();
+      } catch (e) {
+        outputEl.className = "out err";
+        outputEl.textContent = e && e.message ? e.message : String(e);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    function nextStep() {
+      const cur = steps[state.step];
+      const key = cur.key;
+      const val = (inputEl.value || "").trim();
+      if (!val) {
+        inputEl.focus();
+        return;
+      }
+      state.fields[key] = val;
+      inputEl.value = "";
+      state.step++;
+      if (state.step >= steps.length) {
+        // run analysis
+        state.step = steps.length - 1;
+        runAnalysis();
+        return;
+      }
+      inputEl.placeholder = steps[state.step].placeholder;
+      renderChips();
+      inputEl.focus();
+    }
+
+    document.getElementById("next").addEventListener("click", nextStep);
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        if (state.busy) return;
+        nextStep();
+      }
+    });
+
+    document.getElementById("demo").addEventListener("click", () => {
+      state.fields.facts = "我和一个男生暧昧一段时间了，我投入很多情绪和时间，但他一直不明确关系、忽冷忽热。最近他又开始冷下来，我很内耗。";
+      state.fields.goal = "要么推进关系（明确排他/节奏），要么体面止损，不再内耗。";
+      state.fields.boundary = "不能接受失联和长期暧昧不清；不能接受贬低/冷暴力。";
+      state.fields.nextTalk = "确认我们是不是认真发展、是否排他，以及未来一个月的相处节奏。";
+      state.step = steps.length - 1;
+      inputEl.placeholder = steps[state.step].placeholder;
+      renderChips();
+      runAnalysis();
+    });
+
+    document.getElementById("reset").addEventListener("click", resetAll);
+
+    personaFriendlyEl.addEventListener("click", () => setPersona("Friendly"));
+    personaQuquEl.addEventListener("click", () => setPersona("Ququ"));
+
+    directnessEl.addEventListener("input", (e) => setDirectness(Number(e.target.value)));
+
+    tabSoft.addEventListener("click", () => { state.activeTab = "Soft"; updateTabUI(); });
+    tabBalanced.addEventListener("click", () => { state.activeTab = "Balanced"; updateTabUI(); });
+    tabHard.addEventListener("click", () => { state.activeTab = "Hard"; updateTabUI(); });
+
+    // init
+    setPersona("Friendly");
+    setDirectness(35);
+    renderChips();
+    updateTabUI();
+    pingHealth();
+    setInterval(pingHealth, 30000);
+  </script>
+</body>
+</html>
+

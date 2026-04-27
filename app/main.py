@@ -80,16 +80,25 @@ def settings_dep() -> Settings:
 
 @app.get("/")
 async def chat_ui_root() -> FileResponse:
-    """浏览器对话页（与 API 同源，避免 file:// 跨域）。"""
-    index = STATIC_DIR / "index.html"
+    """浏览器入口页（与 API 同源，避免 file:// 跨域）。"""
+    index = STATIC_DIR / "relationship.html"
     if not index.is_file():
-        raise HTTPException(status_code=404, detail="static/index.html missing")
+        raise HTTPException(status_code=404, detail="static/relationship.html missing")
     return FileResponse(index)
 
 
 @app.get("/chat")
 async def chat_ui_alias() -> FileResponse:
     return await chat_ui_root()
+
+
+@app.get("/chat-legacy")
+async def chat_ui_legacy() -> FileResponse:
+    """旧版单框对话页（保留用于对照/回归）。"""
+    index = STATIC_DIR / "index.html"
+    if not index.is_file():
+        raise HTTPException(status_code=404, detail="static/index.html missing")
+    return FileResponse(index)
 
 
 @app.get("/health")
