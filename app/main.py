@@ -6,6 +6,7 @@ from typing import Annotated, Any
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from app.config import Settings, get_settings
@@ -70,6 +71,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve static assets (relationship UI, skill markdown, etc.)
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 def settings_dep() -> Settings:

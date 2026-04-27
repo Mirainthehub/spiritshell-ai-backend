@@ -270,6 +270,7 @@
       step: 0,
       persona: "Friendly",
       directness: 35,
+      ququSkill: "",
       fields: {
         facts: "",
         goal: "",
@@ -391,12 +392,23 @@
         ? "风格偏商业化/结构化：强调价值交换、边界、成本、时间线；结论先行、短句。但禁止贬低、羞辱、骂人、PUA、受害者指责。"
         : "风格温柔但理性：先承接情绪，再给清晰结构与边界，不站队、不羞辱。";
 
+      const ququBlock = persona === "Ququ" && state.ququSkill.trim()
+        ? [
+            "",
+            "——以下为已加载的 relationship-ququ-skill（供你对齐思维框架与表达DNA；不要逐字复述，抓HOW-to-think）：",
+            state.ququSkill.trim(),
+            "——relationship-ququ-skill 结束——",
+            ""
+          ].join("\\n")
+        : "";
+
       return [
         "你是一个关系梳理与决策辅助助手（面向女性用户更友好）。",
         "目标：帮助用户从事实→需求→边界→下一步行动，减少内耗，提升安全感与自尊。",
         "硬性要求：不鼓励操控、欺骗、跟踪、骚扰、羞辱、冷暴力、威胁或任何伤害。遇到暴力/胁迫/未成年/性安全风险要优先提示安全与求助。",
         `输出强度规则（directness=${directness}/100）：${directnessRule}`,
         `风格规则（persona=${persona}）：${personaRule}`,
+        ququBlock,
         "",
         "请只用中文输出，并按下面格式生成三段内容（每段以标题开头）：",
         "【温柔版】…",
@@ -444,6 +456,19 @@
       return out;
     }
 
+    async function ensureQuquSkillLoaded() {
+      if (state.ququSkill.trim()) return;
+      try {
+        const res = await fetch("/static/ququ-skill.md", { cache: "force-cache" });
+        if (!res.ok) return;
+        const text = await res.text();
+        // Keep it bounded to avoid giant prompts / timeouts
+        state.ququSkill = String(text || "").slice(0, 14000);
+      } catch {
+        // ignore
+      }
+    }
+
     async function pingHealth() {
       try {
         const r = await fetch("/health");
@@ -459,6 +484,9 @@
       outputEl.className = "out pending";
       outputEl.textContent = "正在梳理…（首次可能需要几十秒）";
       try {
+        if (state.persona === "Ququ") {
+          await ensureQuquSkillLoaded();
+        }
         const payload = {
           messages: [
             { role: "system", content: buildSystemPrompt() },
@@ -552,7 +580,10 @@
     document.getElementById("reset").addEventListener("click", resetAll);
 
     personaFriendlyEl.addEventListener("click", () => setPersona("Friendly"));
-    personaQuquEl.addEventListener("click", () => setPersona("Ququ"));
+    personaQuquEl.addEventListener("click", async () => {
+      setPersona("Ququ");
+      await ensureQuquSkillLoaded();
+    });
 
     directnessEl.addEventListener("input", (e) => setDirectness(Number(e.target.value)));
 
