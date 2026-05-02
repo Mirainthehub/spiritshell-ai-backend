@@ -50,6 +50,7 @@ const cases: Case[] = [
   {
     name: "English mock — locale → EN demo summary",
     body: {
+      responseLocale: "en",
       intakeState: {
         ...emptyIntakeState(),
         situation:
@@ -75,7 +76,7 @@ const cases: Case[] = [
       // Older deployments ignored locale and always returned Chinese mock.
       if (/[\u4e00-\u9fff]/.test(s) && s.includes("产出")) {
         console.warn(
-          "  (warn) English intake got Chinese mock — redeploy latest for locale-aware mocks.",
+          "  (warn) responseLocale=en still returned Chinese mock — redeploy API with `responseLocale` + locale mocks.",
         );
         return;
       }
@@ -87,6 +88,7 @@ const cases: Case[] = [
   {
     name: "Chinese mock — locale → ZH demo summary",
     body: {
+      responseLocale: "zh",
       intakeState: {
         ...emptyIntakeState(),
         situation:

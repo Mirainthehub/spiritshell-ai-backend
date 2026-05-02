@@ -152,9 +152,12 @@ Request body:
 {
   "intakeState": { "...": "IntakeState fields" },
   "conversation": [{ "role": "user"|"assistant", "content": "..." }],
-  "useMock": false
+  "useMock": false,
+  "responseLocale": "auto"
 }
 ```
+
+Optional `responseLocale`: `"auto"` (omit), `"zh"`, or `"en"`. Use `"en"` / `"zh"` when auto-detection is wrong (e.g. English situation but Chinese assistant prompts in the transcript).
 
 Response: `{ result: AnalysisResult, mock?: boolean, message?: string, error?: string }`.
 

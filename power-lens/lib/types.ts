@@ -107,4 +107,10 @@ export interface AnalyzeApiRequestBody {
   intakeState: IntakeState;
   conversation: ChatTurn[];
   useMock?: boolean;
+  /**
+   * Output language for narrative JSON values.
+   * `auto` (omit): infer from CJK vs Latin in intake + conversation.
+   * Use `en` or `zh` when the heuristic is wrong (e.g. English situation but Chinese assistant prompts).
+   */
+  responseLocale?: "auto" | "zh" | "en";
 }

@@ -7,9 +7,8 @@ import {
   type ChatTurn,
   type IntakeState,
 } from "@/lib/intake";
-import type { AnalysisResult } from "@/lib/types";
+import type { AnalysisResult, AnalyzeApiRequestBody } from "@/lib/types";
 import { getDemoChatBootstrap } from "@/lib/demo-analyze-fixtures";
-import { MOCK_ANALYSIS } from "@/lib/mock-data";
 import { ChatIntakePanel, type IntakeSessionMeta } from "./ChatIntakePanel";
 import { ResultsDisplay } from "./ResultsDisplay";
 
@@ -30,6 +29,9 @@ export function PowerLensApp() {
   const [error, setError] = useState<string | null>(null);
   const [infoBanner, setInfoBanner] = useState<string | null>(null);
   const [usedMock, setUsedMock] = useState(false);
+  const [outputLocale, setOutputLocale] = useState<"auto" | "zh" | "en">(
+    "auto",
+  );
 
   const readiness = useMemo(() => getReadinessScore(intake), [intake]);
 
@@ -63,21 +65,25 @@ export function PowerLensApp() {
       useMock: boolean;
       intakeOverride?: IntakeState;
       conversationOverride?: ChatTurn[];
+      responseLocale?: AnalyzeApiRequestBody["responseLocale"];
     }) => {
       setLoading(true);
       setError(null);
       setInfoBanner(null);
       const i = opts.intakeOverride ?? intake;
       const c = opts.conversationOverride ?? conversation;
+      const rl = opts.responseLocale ?? outputLocale;
       try {
+        const payload: AnalyzeApiRequestBody = {
+          intakeState: i,
+          conversation: c,
+          useMock: opts.useMock,
+        };
+        if (rl !== "auto") payload.responseLocale = rl;
         const res = await fetch("/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            intakeState: i,
-            conversation: c,
-            useMock: opts.useMock,
-          }),
+          body: JSON.stringify(payload),
         });
         const json = (await res.json()) as {
           result?: AnalysisResult;
@@ -114,7 +120,7 @@ export function PowerLensApp() {
         setLoading(false);
       }
     },
-    [intake, conversation],
+    [intake, conversation, outputLocale],
   );
 
   const handleAnalyze = () => {
@@ -129,6 +135,7 @@ export function PowerLensApp() {
 
   const handleLoadDemo = () => {
     setError(null);
+    setOutputLocale("zh");
     const boot = getDemoChatBootstrap("zh");
     setPanelBootstrap(boot);
     setPanelKey((k) => k + 1);
@@ -136,11 +143,13 @@ export function PowerLensApp() {
       useMock: true,
       intakeOverride: boot.intake,
       conversationOverride: boot.messages,
+      responseLocale: "zh",
     });
   };
 
   const handleLoadDemoEn = () => {
     setError(null);
+    setOutputLocale("en");
     const boot = getDemoChatBootstrap("en");
     setPanelBootstrap(boot);
     setPanelKey((k) => k + 1);
@@ -148,6 +157,7 @@ export function PowerLensApp() {
       useMock: true,
       intakeOverride: boot.intake,
       conversationOverride: boot.messages,
+      responseLocale: "en",
     });
   };
 
@@ -158,6 +168,7 @@ export function PowerLensApp() {
     setError(null);
     setInfoBanner(null);
     setUsedMock(false);
+    setOutputLocale("auto");
   };
 
   const copyJson = async () => {
@@ -203,7 +214,22 @@ export function PowerLensApp() {
             briefing instrument.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="flex items-center gap-2 rounded border border-surface-border bg-surface-overlay px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-ink-faint">
+            <span className="text-ink-secondary">Output</span>
+            <select
+              value={outputLocale}
+              onChange={(e) =>
+                setOutputLocale(e.target.value as "auto" | "zh" | "en")
+              }
+              disabled={loading}
+              className="max-w-[140px] cursor-pointer rounded border border-white/10 bg-black/40 px-2 py-1 text-[11px] font-normal normal-case tracking-normal text-ink-primary focus:border-accent/40 focus:outline-none disabled:opacity-50"
+            >
+              <option value="auto">Auto (infer)</option>
+              <option value="en">English</option>
+              <option value="zh">中文</option>
+            </select>
+          </label>
           <button
             type="button"
             onClick={handleResetAll}

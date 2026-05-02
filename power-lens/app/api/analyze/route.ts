@@ -4,14 +4,22 @@ import {
   buildAnalysisSystemPrompt,
 } from "@/lib/analysisPrompt";
 import { parseModelJson } from "@/lib/parseJson";
-import { detectResponseLocale } from "@/lib/detectResponseLocale";
+import {
+  detectResponseLocale,
+  type ResponseLocale,
+} from "@/lib/detectResponseLocale";
 import { MOCK_ANALYSIS } from "@/lib/mock-data";
 import { MOCK_ANALYSIS_EN } from "@/lib/mock-data-en";
 import { normalizeAnalysisResult } from "@/lib/normalize";
 import type { AnalysisResult, AnalyzeApiRequestBody } from "@/lib/types";
-
-function mockForLocale(locale: "zh" | "en"): AnalysisResult {
+function mockForLocale(locale: ResponseLocale): AnalysisResult {
   return locale === "zh" ? MOCK_ANALYSIS : MOCK_ANALYSIS_EN;
+}
+
+function resolveResponseLocale(body: AnalyzeApiRequestBody): ResponseLocale {
+  const mode = body.responseLocale;
+  if (mode === "zh" || mode === "en") return mode;
+  return detectResponseLocale(body.intakeState, body.conversation);
 }
 
 export const runtime = "nodejs";
@@ -91,7 +99,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const locale = detectResponseLocale(body.intakeState, body.conversation);
+  const locale = resolveResponseLocale(body);
 
   if (body.useMock) {
     return NextResponse.json({ result: mockForLocale(locale), mock: true });
